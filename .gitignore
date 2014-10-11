@@ -1,1 +1,2 @@
-*.kdev4
+/conf/local.json
+/src/.phutil_module_cache
