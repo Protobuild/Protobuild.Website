@@ -12,6 +12,8 @@ final class RouteDelegation {
       '/packages/new' => 'PackagesEditController',
       '/packages/edit/(?P<name>[^/]+)' => 'PackagesEditController',
       '/packages/manage' => 'PackagesManageController',
+      '/(?P<user>[^/]+)' => 'AccountViewController',
+      '/(?P<user>[^/]+)/' => 'AccountViewController',
     );
   }
   
