@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-require_once realpath(dirname(__FILE__) . '/../../../autoload.php');
-
 /*
  * This class implements a basic on disk storage. While that does
  * work quite well it's not the most elegant and scalable solution.

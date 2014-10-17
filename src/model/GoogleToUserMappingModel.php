@@ -38,11 +38,19 @@ final class GoogleToUserMappingModel {
     $key = new Google_Service_Datastore_Key();
     $key->setPath(array($path));
     
+    $user_prop = new Google_Service_Datastore_Property();
+    $user_prop->setStringValue($this->getUser());
+    $user_prop->setIndexed(true);
+    
+    $google_id_prop = new Google_Service_Datastore_Property();
+    $google_id_prop->setIntegerValue($this->getGoogleID());
+    $google_id_prop->setIndexed(true);
+    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
     $entity->setProperties(array(
-      'user' => $this->getUser(),
-      'googleID' => $this->getGoogleID()
+      'user' => $user_prop,
+      'googleID' => $google_id_prop,
     ));
 
     $mutation = new Google_Service_Datastore_Mutation();
@@ -52,10 +60,13 @@ final class GoogleToUserMappingModel {
     $req->setMutation($mutation);
     
     $dataset = $this->datastore->datasets;
-    $dataset_id = /* TODO */;
+    $dataset_id = "protobuild-index";
     
     $dataset->commit($dataset_id, $req);
   }
   
+  public function load($google_id) {
+    
+  }
   
 }

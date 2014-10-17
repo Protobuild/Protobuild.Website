@@ -16,12 +16,13 @@ final class GoogleService extends Phobject {
     $client = new Google_Client();
     $client->setApplicationName('Protobuild Index');
     $client->setAssertionCredentials(new Google_Auth_AssertionCredentials(
-      ProtobuildEnv::get("google.service.clientID"),
+      ProtobuildEnv::get("google.service.emailAddress"),
       array(
         "https://www.googleapis.com/auth/datastore",
         "https://www.googleapis.com/auth/userinfo.email"
       ),
-      ProtobuildEnv::get("google.service.privateKey")));
+      ProtobuildEnv::get("google.service.privateKey"),
+      null));
     $client->setDeveloperKey(ProtobuildEnv::get("google.developerKey"));
     return $client;
   }
