@@ -102,7 +102,7 @@ abstract class ProtobuildController extends Phobject {
       $auth = array(
         phutil_tag(
         'a',
-        array('href' => '/manage'),
+        array('href' => '/packages/manage'),
         'Login'));
     }
     
