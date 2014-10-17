@@ -9,6 +9,7 @@ final class RouteDelegation {
       '/oauth2callback' => 'OAuth2CallbackController',
       '/manage' => 'PackagesManageController',
       '/logout' => 'LogoutController',
+      '/account/name' => 'AccountNameController',
     );
   }
   

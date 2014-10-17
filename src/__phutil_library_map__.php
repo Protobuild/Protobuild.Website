@@ -9,6 +9,7 @@
 phutil_register_library_map(array(
   '__library_version__' => 2,
   'class' => array(
+    'AccountNameController' => 'controller/AccountNameController.php',
     'AphrontURIMapper' => 'infrastructure/AphrontURIMapper.php',
     'AuthSession' => 'auth/AuthSession.php',
     'Breadcrumbs' => 'ui/Breadcrumbs.php',
@@ -32,6 +33,7 @@ phutil_register_library_map(array(
   ),
   'function' => array(),
   'xmap' => array(
+    'AccountNameController' => 'ProtobuildController',
     'Breadcrumbs' => 'Control',
     'Control' => array(
       'Phobject',

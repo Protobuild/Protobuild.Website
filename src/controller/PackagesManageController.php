@@ -8,11 +8,6 @@ final class PackagesManageController extends ProtobuildController {
     $breadcrumbs->addBreadcrumb('Package Index', '/index');
     $breadcrumbs->addBreadcrumb('Manage');
     
-    $model = id(new GoogleToUserMappingModel())
-      ->setUser('hach-que')
-      ->setGoogleID(123845658)
-      ->create();
-    
     return $this->buildApplicationPage(array(
       $breadcrumbs,
       new IndexBannerControl()

@@ -3,6 +3,7 @@
 abstract class ProtobuildController extends Phobject {
   
   private $session;
+  private $user;
   
   public function beginRequest(array $data) {
     $this->session = new AuthSession();
@@ -11,14 +12,34 @@ abstract class ProtobuildController extends Phobject {
     if (!$this->allowPublicAccess() && !$this->session->isAuthenticated()) {
       $this->session->authenticate();
     }
+    
+    if (!$this->allowPublicAccess() && $this->session->isAuthenticated()) {
+      $this->user = id(new GoogleToUserMappingModel())
+        ->load($this->getSession()->getUserID());
+      
+      if ($this->requiresAccountName()) {
+        if ($this->user === null || $this->user->getUser() === null) {
+          header('Location: /account/name');
+          die();
+        }
+      }
+    }
   }
   
   protected function getSession() {
     return $this->session;
   }
   
+  protected function getUser() {
+    return $this->user;
+  }
+  
   protected function allowPublicAccess() {
     return false;
+  }
+  
+  protected function requiresAccountName() {
+    return true;
   }
   
   abstract function processRequest(array $data);
