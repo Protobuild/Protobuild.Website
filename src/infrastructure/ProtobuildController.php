@@ -11,6 +11,7 @@ abstract class ProtobuildController extends Phobject {
     
     if (!$this->allowPublicAccess() && !$this->session->isAuthenticated()) {
       $this->session->authenticate();
+      return;
     }
     
     if (!$this->allowPublicAccess() && $this->session->isAuthenticated()) {
