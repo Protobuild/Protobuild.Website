@@ -7,9 +7,11 @@ final class RouteDelegation {
       '/' => 'HomeController',
       '/index' => 'IndexController',
       '/oauth2callback' => 'OAuth2CallbackController',
-      '/manage' => 'PackagesManageController',
       '/logout' => 'LogoutController',
       '/account/name' => 'AccountNameController',
+      '/packages/new' => 'PackagesEditController',
+      '/packages/edit/(?P<name>[^/]+)' => 'PackagesEditController',
+      '/packages/manage' => 'PackagesManageController',
     );
   }
   

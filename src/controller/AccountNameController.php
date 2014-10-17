@@ -2,6 +2,10 @@
 
 final class AccountNameController extends ProtobuildController {
   
+  protected function showInDevelopmentWarning() {
+    return true;
+  }
+  
   protected function requiresAccountName() {
     return false;
   }
@@ -17,7 +21,7 @@ final class AccountNameController extends ProtobuildController {
         ->loadByName($_POST['username']);
       
       if ($existing === null) {
-        if (preg_match('/[a-z0-9-]+/', $_POST['username'], $matches) === 1) {
+        if (preg_match('/^[a-z0-9-]+$/', $_POST['username'], $matches) === 1) {
           
           if ($current === null) {
             $mapping = id(new GoogleToUserMappingModel())
@@ -26,7 +30,7 @@ final class AccountNameController extends ProtobuildController {
               ->create();
               
             // On first set, redirect to manage packages.
-            header('Location: /manage');
+            header('Location: /packages/manage');
             die();
               
           } else {

@@ -48,6 +48,10 @@ abstract class ProtobuildController extends Phobject {
     return null;
   }
   
+  protected function showInDevelopmentWarning() {
+    return false;
+  }
+  
   protected function buildApplicationPage($content) {
     $navigation = array(
       'home' => array('uri' => '/', 'title' => 'Home'),
@@ -86,7 +90,7 @@ abstract class ProtobuildController extends Phobject {
         phutil_safe_html(' &bull; '),
         phutil_tag(
           'a',
-          array('href' => '/manage'),
+          array('href' => '/packages/manage'),
           'Manage Packages'),
         phutil_safe_html(' &bull; '),
         phutil_tag(
@@ -99,6 +103,21 @@ abstract class ProtobuildController extends Phobject {
         'a',
         array('href' => '/manage'),
         'Login'));
+    }
+    
+    $in_dev = null;
+    if ($this->showInDevelopmentWarning()) {
+      $in_dev = 
+        phutil_tag(
+          'div', 
+          array('class' => 'alert alert-warning', 'role' => 'alert'),
+          array(
+            phutil_tag(
+              'strong',
+              array(),
+              'In Development!'),
+            '  This functionality is still under heavy development '.
+            'and is not expected to work yet.'));
     }
     
     return hsprintf(<<<EOF
@@ -128,6 +147,8 @@ abstract class ProtobuildController extends Phobject {
 
       %s
       
+      %s
+      
       <div class="footer">
         <p>%s</p>
       </div>
@@ -142,6 +163,7 @@ abstract class ProtobuildController extends Phobject {
 EOF
     ,
     $navigation_tags,
+    $in_dev,
     $content,
     $auth);
   }

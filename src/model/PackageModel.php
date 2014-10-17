@@ -1,12 +1,14 @@
 <?php
 
-final class GoogleToUserMappingModel {
+final class PackageModel {
   
   private $key;
   private $googleID;
-  private $user;
+  private $name;
+  private $gitURL;
+  private $description;
   
-  const KIND = 'user';
+  const KIND = 'package';
   
   public function __construct() {
     $this->datastore = id(new GoogleService())->getGoogleCloudDatastore();
@@ -30,13 +32,68 @@ final class GoogleToUserMappingModel {
     return $this;
   }
   
-  public function getUser() {
-    return $this->user;
+  public function getName() {
+    return $this->name;
   }
   
-  public function setUser($user) {
-    $this->user = $user;
+  public function setName($name) {
+    $this->name = $name;
     return $this;
+  }
+  
+  public function getGitURL() {
+    return $this->gitURL;
+  }
+  
+  public function setGitURL($git_url) {
+    $this->gitURL = $git_url;
+    return $this;
+  }
+  
+  public function getDescription() {
+    return $this->description;
+  }
+  
+  public function setDescription($description) {
+    $this->description = $description;
+    return $this;
+  }
+  
+  public function getFormattedDescription() {
+    $html = array();
+    $lines = phutil_split_lines($this->description);
+    foreach ($lines as $line) {
+      $html[] = phutil_tag('br', array(), null);
+      $html[] = $line;
+    }
+    array_shift($html);
+    return $html;
+  }
+  
+  private function mapProperties() {
+    $mappings = array(
+      'name' => $this->getName(),
+      'googleID' => $this->getGoogleID(),
+      'gitURL' => $this->getGitURL(),
+      'description' => $this->getDescription(),
+    );
+    
+    $indexes = array(
+      'name' => true,
+      'googleID' => true
+    );
+    
+    $results = array();
+    
+    foreach ($mappings as $name => $value) {
+      $prop = new Google_Service_Datastore_Property();
+      $prop->setStringValue($value);
+      $prop->setIndexed(array_key_exists($name, $indexes));
+      
+      $results[$name] = $prop;
+    }
+    
+    return $results;
   }
   
   public function create() {
@@ -47,20 +104,9 @@ final class GoogleToUserMappingModel {
     $key = new Google_Service_Datastore_Key();
     $key->setPath(array($path));
     
-    $user_prop = new Google_Service_Datastore_Property();
-    $user_prop->setStringValue($this->getUser());
-    $user_prop->setIndexed(true);
-    
-    $google_id_prop = new Google_Service_Datastore_Property();
-    $google_id_prop->setStringValue($this->getGoogleID());
-    $google_id_prop->setIndexed(true);
-    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
-    $entity->setProperties(array(
-      'user' => $user_prop,
-      'googleID' => $google_id_prop,
-    ));
+    $entity->setProperties($this->mapProperties());
 
     $mutation = new Google_Service_Datastore_Mutation();
     $mutation->setInsertAutoId(array($entity));
@@ -82,20 +128,9 @@ final class GoogleToUserMappingModel {
     $key = new Google_Service_Datastore_Key();
     $key->setPath(array($path));
     
-    $user_prop = new Google_Service_Datastore_Property();
-    $user_prop->setStringValue($this->getUser());
-    $user_prop->setIndexed(true);
-    
-    $google_id_prop = new Google_Service_Datastore_Property();
-    $google_id_prop->setStringValue($this->getGoogleID());
-    $google_id_prop->setIndexed(true);
-    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
-    $entity->setProperties(array(
-      'user' => $user_prop,
-      'googleID' => $google_id_prop,
-    ));
+    $entity->setProperties($this->mapProperties());
 
     $mutation = new Google_Service_Datastore_Mutation();
     $mutation->setUpdate(array($entity));
@@ -109,16 +144,16 @@ final class GoogleToUserMappingModel {
     $dataset->commit($dataset_id, $req);
   }
   
-  public function load($google_id) {
+  public function loadAllForUser(GoogleToUserMappingModel $user) {
     $id_value = new Google_Service_Datastore_Value();
-    $id_value->setStringValue($google_id);
+    $id_value->setStringValue($user->getGoogleID());
     
     $id_arg = new Google_Service_Datastore_GqlQueryArg();
     $id_arg->setName('id');
     $id_arg->setValue($id_value);
     
     $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM user WHERE googleID = @id');
+    $gql_query->setQueryString('SELECT * FROM package WHERE googleID = @id');
     $gql_query->setNameArgs(array($id_arg));
     
     $query = new Google_Service_Datastore_RunQueryRequest();
@@ -132,32 +167,42 @@ final class GoogleToUserMappingModel {
     $batch = $result->getBatch();
     $entities = $batch->getEntityResults();
     
-    if (count($entities) === 0) {
-      return null;
+    $results = array();
+    
+    foreach ($entities as $entity_result) {
+      $entity = $entity_result->getEntity();
+      $props = $entity->getProperties();
+      
+      $results[] = id(new PackageModel())
+        ->setKey(head($entity->getKey()->getPath())->getId())
+        ->setName(idx($props, 'name')->getStringValue())
+        ->setGoogleID(idx($props, 'googleID')->getStringValue())
+        ->setGitURL(idx($props, 'gitURL')->getStringValue())
+        ->setDescription(idx($props, 'description')->getStringValue());
     }
     
-    $entity = head($entities);
-    $entity = $entity->getEntity();
-    $props = $entity->getProperties();
-    
-    $this->setKey(head($entity->getKey()->getPath())->getId());
-    $this->setUser(idx($props, 'user')->getStringValue());
-    $this->setGoogleID(idx($props, 'googleID')->getStringValue());
-    
-    return $this;
+    return $results;
   }
   
-  public function loadByName($username) {
+  public function loadByUserAndName(GoogleToUserMappingModel $user, $name) {
     $name_value = new Google_Service_Datastore_Value();
-    $name_value->setStringValue($username);
+    $name_value->setStringValue($name);
     
     $name_arg = new Google_Service_Datastore_GqlQueryArg();
     $name_arg->setName('name');
     $name_arg->setValue($name_value);
     
+    $id_value = new Google_Service_Datastore_Value();
+    $id_value->setStringValue($user->getGoogleID());
+    
+    $id_arg = new Google_Service_Datastore_GqlQueryArg();
+    $id_arg->setName('id');
+    $id_arg->setValue($id_value);
+    
     $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM user WHERE user = @name');
-    $gql_query->setNameArgs(array($name_arg));
+    $gql_query->setQueryString(
+      'SELECT * FROM package WHERE googleID = @id AND name = @name');
+    $gql_query->setNameArgs(array($id_arg, $name_arg));
     
     $query = new Google_Service_Datastore_RunQueryRequest();
     $query->setGqlQuery($gql_query);
@@ -178,9 +223,12 @@ final class GoogleToUserMappingModel {
     $entity = $entity->getEntity();
     $props = $entity->getProperties();
     
-    $this->setKey(head($entity->getKey()->getPath())->getId());
-    $this->setUser(idx($props, 'user')->getStringValue());
-    $this->setGoogleID(idx($props, 'googleID')->getStringValue());
+    $this
+      ->setKey(head($entity->getKey()->getPath())->getId())
+      ->setName(idx($props, 'name')->getStringValue())
+      ->setGoogleID(idx($props, 'googleID')->getStringValue())
+      ->setGitURL(idx($props, 'gitURL')->getStringValue())
+      ->setDescription(idx($props, 'description')->getStringValue());
     
     return $this;
   }
