@@ -14,6 +14,7 @@ phutil_register_library_map(array(
     'Breadcrumbs' => 'ui/Breadcrumbs.php',
     'Control' => 'ui/Control.php',
     'GoogleService' => 'google/GoogleService.php',
+    'GoogleToUserMappingModel' => 'model/GoogleToUserMappingModel.php',
     'HomeBannerControl' => 'ui/HomeBannerControl.php',
     'HomeController' => 'controller/HomeController.php',
     'HomeFeaturesControl' => 'ui/HomeFeaturesControl.php',

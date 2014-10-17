@@ -12,4 +12,26 @@ final class GoogleService extends Phobject {
     return $client;
   }
   
+  public function getGoogleServiceClient() {
+    $client = new Google_Client();
+    $client->setApplicationName('Protobuild Index');
+    $client->setAssertionCredentials(new Google_Auth_AssertionCredentials(
+      ProtobuildEnv::get("google.service.clientID"),
+      array(
+        "https://www.googleapis.com/auth/datastore",
+        "https://www.googleapis.com/auth/userinfo.email"
+      ),
+      ProtobuildEnv::get("google.service.privateKey")));
+    $client->setDeveloperKey(ProtobuildEnv::get("google.developerKey"));
+    return $client;
+  }
+  
+  public function getGoogleCloudDatastore() {
+    return new Google_Service_Datastore($this->getGoogleServiceClient());
+  }
+  
+  public function getGoogleCloudStorage() {
+    return new Google_Service_Storage($this->getGoogleServiceClient());
+  }
+  
 }
