@@ -36,7 +36,7 @@ final class PackagesManageController extends ProtobuildController {
                 array('class' => 'panel-title'),
                 phutil_tag(
                   'a',
-                  array('href' => '/packages/edit/'.$package->getName()),
+                  array('href' => '/'.$this->getUser()->getUser().'/'.$package->getName()),
                   $package->getName()))),
             phutil_tag(
               'div',

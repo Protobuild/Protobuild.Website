@@ -11,9 +11,15 @@ final class RouteDelegation {
       '/account/name' => 'AccountNameController',
       '/packages/new' => 'PackagesEditController',
       '/packages/edit/(?P<name>[^/]+)' => 'PackagesEditController',
+      '/packages/upload/(?P<name>[^/]+)' => 'PackagesUploadController',
       '/packages/manage' => 'PackagesManageController',
       '/(?P<user>[^/]+)' => 'AccountViewController',
       '/(?P<user>[^/]+)/' => 'AccountViewController',
+      '/(?P<user>[^/]+)/(?P<name>[^/]+)' => 'PackagesViewController',
+      '/(?P<user>[^/]+)/(?P<name>[^/]+)/' => 'PackagesViewController',
+      '/(?P<user>[^/]+)/(?P<name>[^/]+)/index' => 'IndexIndexController',
+      '/(?P<user>[^/]+)/(?P<name>[^/]+)/(?P<version>[^/]+)/platforms' => 'IndexPlatformsController',
+      '/(?P<user>[^/]+)/(?P<name>[^/]+)/(?P<version>[^/]+)/(?P<platform>[^/]+)\.tar\.gz' => 'IndexPackageController',
     );
   }
   

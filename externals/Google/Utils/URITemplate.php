@@ -327,7 +327,7 @@ class Google_Utils_URITemplate
     if ($length) {
       $value = substr($value, 0, $length);
     }
-    $value = rawurlencode($value);
+    $value = @rawurlencode($value);
     return $value;
   }
 }

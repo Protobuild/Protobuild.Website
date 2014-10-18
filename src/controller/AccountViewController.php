@@ -31,7 +31,7 @@ final class AccountViewController extends ProtobuildController {
     
     $breadcrumbs = new Breadcrumbs();
     $breadcrumbs->addBreadcrumb('Package Index', '/index');
-    $breadcrumbs->addBreadcrumb($user->getUser().'\'s Packages');
+    $breadcrumbs->addBreadcrumb($user->getUser());
     
     $packages = id(new PackageModel())->loadAllForUser($user);
     
@@ -57,7 +57,7 @@ final class AccountViewController extends ProtobuildController {
                 array('class' => 'panel-title'),
                 phutil_tag(
                   'a',
-                  array('href' => $package->getGitURL()),
+                  array('href' => '/'.$user->getUser().'/'.$package->getName()),
                   $package->getName()))),
             phutil_tag(
               'div',

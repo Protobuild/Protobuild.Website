@@ -19,7 +19,8 @@ final class GoogleService extends Phobject {
       ProtobuildEnv::get("google.service.emailAddress"),
       array(
         "https://www.googleapis.com/auth/datastore",
-        "https://www.googleapis.com/auth/userinfo.email"
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/devstorage.full_control",
       ),
       ProtobuildEnv::get("google.service.privateKey"),
       null));
