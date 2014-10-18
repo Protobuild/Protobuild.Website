@@ -89,10 +89,6 @@ final class PackagesUploadController extends ProtobuildController {
         </select>
       </div>
       <div class="form-group">
-        <label class="control-label" for="version">Make Default Version?</label><br />
-        <input type="checkbox" name="makeDefault"> Make this the default version for new users
-      </div>
-      <div class="form-group">
         <label class="control-label" for="uploadFile">Package File (*.tar.gz)</label>
         <input type="file" name="uploadFile" accept="application/x-gtar">
         <p class="help-block">This file should contain the appropriate Protobuild project structure.</p>

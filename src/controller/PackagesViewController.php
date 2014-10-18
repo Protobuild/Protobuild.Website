@@ -143,10 +143,14 @@ EOF
       'Upload New Version'
     );
     
-    $buttons = phutil_tag('p', array(), array(
-      $upload_version,
-      ' ',
-      $edit_package));
+    if ($this->getUser() !== null && $this->getUser()->getUser() === $user->getUser()) {
+      $buttons = phutil_tag('p', array(), array(
+        $upload_version,
+        ' ',
+        $edit_package));
+    } else {
+      $buttons = null;
+    }
     
     $message = null;
     if (idx($_GET, 'uploaded', 'false') === 'true') {
