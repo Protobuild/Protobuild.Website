@@ -223,7 +223,7 @@ final class ProtobuildStartup {
     static $initialized;
     if (!$initialized) {
       declare(ticks=1);
-      register_tick_function(array('PhabricatorStartup', 'onDebugTick'));
+      register_tick_function(array('ProtobuildStartup', 'onDebugTick'));
     }
   }
 
@@ -589,7 +589,7 @@ final class ProtobuildStartup {
     // populated into $_POST, but it wasn't.
 
     $config = ini_get('post_max_size');
-    PhabricatorStartup::didFatal(
+    ProtobuildStartup::didFatal(
       "As received by the server, this request had a nonzero content length ".
       "but no POST data.\n\n".
       "Normally, this indicates that it exceeds the 'post_max_size' setting ".

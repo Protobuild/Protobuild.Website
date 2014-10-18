@@ -13,8 +13,8 @@ abstract class ProtobuildController extends Phobject {
       $this->session->authenticate();
       return;
     }
-    
-    if (!$this->allowPublicAccess() && $this->session->isAuthenticated()) {
+
+    if ($this->session->isAuthenticated()) {
       $this->user = id(new GoogleToUserMappingModel())
         ->load($this->getSession()->getUserID());
       
