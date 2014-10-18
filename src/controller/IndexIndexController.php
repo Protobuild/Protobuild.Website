@@ -1,6 +1,10 @@
 <?php
 
 final class IndexIndexController extends ProtobuildController {
+ 
+  protected function allowPublicAccess() {
+    return true;
+  }
   
   public function processRequest(array $data) {
     

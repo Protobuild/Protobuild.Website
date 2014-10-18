@@ -2,6 +2,10 @@
 
 final class IndexPackageController extends ProtobuildController {
   
+  protected function allowPublicAccess() {
+    return true;
+  } 
+ 
   public function processRequest(array $data) {
     
     $username = idx($data, 'user');
