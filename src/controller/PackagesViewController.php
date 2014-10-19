@@ -77,13 +77,16 @@ EOF;
     
     $desc = phutil_tag('p', array(), $package->getFormattedDescription());
     
-    $git = array(
-      phutil_tag('h3', array(), 'Source Code'),
-      hsprintf(<<<EOF
+    $git = null;
+    if (strlen($package->getGitURL()) !== 0) {
+      $git = array(
+        phutil_tag('h3', array(), 'Source Code'),
+        hsprintf(<<<EOF
 <p>The source code for this package resides at:</p>
-<p><strong>%s</strong></p>
+<p><a href="%s"><strong>%s</strong></a></p>
 EOF
-      , $package->getGitURL()));
+        , $package->getGitURL(), $package->getGitURL()));
+    }
     
     $versions = id(new VersionModel())->loadAllForPackage($user, $package);
     
