@@ -25,6 +25,7 @@ require_once $protobuild_root.'/externals/Google/Http/REST.php';
 require_once $protobuild_root.'/externals/Google/Http/MediaFileUpload.php';
 require_once $protobuild_root.'/externals/Google/IO/Abstract.php';
 require_once $protobuild_root.'/externals/Google/IO/Curl.php';
+require_once $protobuild_root.'/externals/Google/IO/Exception.php';
 require_once $protobuild_root.'/externals/Google/Utils/URITemplate.php';
 require_once $protobuild_root.'/externals/Google/Cache/Abstract.php';
 require_once $protobuild_root.'/externals/Google/Cache/File.php';

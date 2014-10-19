@@ -38,6 +38,10 @@ final class PackagesViewController extends ProtobuildController {
       die();
     }
     
+    $can_edit = 
+      $this->getUser() !== null && 
+      $this->getUser()->getUser() === $user->getUser();
+    
     $breadcrumbs = new Breadcrumbs();
     $breadcrumbs->addBreadcrumb('Package Index', '/index');
     $breadcrumbs->addBreadcrumb(
@@ -98,29 +102,45 @@ EOF
       $versions_items = array();
       
       foreach ($versions_grouped as $version_name => $version_platforms) {
-        $platforms = mpull($version_platforms, 'getPlatformName');
-        $platforms = implode($platforms, ', ');
         
-        $versions_items[] = phutil_tag(
-          'a',
-          array('class' => 'list-group-item'),
-          array(
-            phutil_tag(
-              'h4',
-              array('class' => 'list-group-item-heading'),
-              $version_name),
-            phutil_tag(
-              'p',
-              array('class' => 'list-group-item-text'),
-              'Binaries available for: '.$platforms)));
+        $platforms = array();
+        foreach ($version_platforms as $platform_entry) {
+          
+          $context = null;
+          $badge = null;
+          $target = '#';
+          
+          if ($can_edit) {
+            if (!$platform_entry->getHasFile()) {
+              $context = ' list-group-item-danger';
+              $badge = phutil_tag(
+                'span',
+                array('class' => 'badge'),
+                'Binary Missing');
+              $target = '/packages/version/upload/'.$platform_entry->getKey();
+            }
+          }
+          
+          $platforms[] = phutil_tag(
+            'a',
+            array(
+              'class' => 'list-group-item'.$context,
+              'href' => $target,
+            ),
+            array(
+              $badge,
+              $platform_entry->getPlatformName()));
+        }
+        
+        $versions_items[] = id(new Panel())
+          ->setHeading($version_name)
+          ->setNoBody(true)
+          ->appendChild($platforms);
       }
       
       $versions_html = array(
         phutil_tag('h3', array(), 'Binary Versions'),
-        phutil_tag(
-        'div',
-        array('class' => 'list-group'),
-        $versions_items));
+        $versions_items);
     }
     
     $edit_package = phutil_tag(
@@ -138,12 +158,12 @@ EOF
       array(
         'type' => 'button',
         'class' => 'btn btn-primary',
-        'href' => '/packages/upload/'.$package->getName(),
+        'href' => '/packages/version/new/'.$package->getName(),
       ),
-      'Upload New Version'
+      'Create and Upload New Version'
     );
     
-    if ($this->getUser() !== null && $this->getUser()->getUser() === $user->getUser()) {
+    if ($can_edit) {
       $buttons = phutil_tag('p', array(), array(
         $upload_version,
         ' ',

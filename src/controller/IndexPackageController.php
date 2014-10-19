@@ -32,6 +32,11 @@ final class IndexPackageController extends ProtobuildController {
       // TODO 404
       die();
     }
+      
+    // Attempt to resolve version_name as a branch.
+    $branches = id(new BranchModel())->loadAllForPackage($user, $package);
+    $branches = mpull($branches, 'getVersionName', 'getBranchName');
+    $version_name = idx($branches, $version_name, $version_name);
     
     $version = id(new VersionModel())->loadByPackagePlatformAndVersion(
       $user,

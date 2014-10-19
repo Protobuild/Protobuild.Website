@@ -82,3 +82,33 @@ h4 > span.glyphicon {
   font-size: 15px;
   margin-right: 2px;
 }
+
+/* Package version lists */
+div.panel > a.list-group-item {
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+div.panel > a.list-group-item:nth-of-type(1) {
+  border-top: none;
+}
+
+/* Dynamic file upload */
+div.dynamic-file-upload, div.dynamic-file-upload-hover {
+  border: 3px dashed #ddd;
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+div.dynamic-file-upload-hover {
+  background-color: #cfc;
+}
+
+form > div.form-group:last-child, form > div.form-group:last-child > p {
+  margin-bottom: 0px;
+}
+
+div.progress { 
+  margin-bottom: 4px;
+}

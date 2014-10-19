@@ -45,6 +45,14 @@ final class IndexIndexController extends ProtobuildController {
       }
     }
     
+    $branches = id(new BranchModel())->loadAllForPackage($user, $package);
+    
+    if (count($branches) !== 0) {
+      foreach ($branches as $branch) {
+        echo $branch->getBranchName()."\r\n";
+      }
+    }
+    
     return '';
   }
   

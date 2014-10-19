@@ -1,15 +1,14 @@
 <?php
 
-final class VersionModel {
+final class BranchModel {
   
   private $key;
   private $googleID;
   private $packageName;
-  private $platformName;
+  private $branchName;
   private $versionName;
-  private $hasFile = false;
   
-  const KIND = 'version';
+  const KIND = 'branch';
   
   public function __construct() {
     $this->datastore = id(new GoogleService())->getGoogleCloudDatastore();
@@ -51,21 +50,12 @@ final class VersionModel {
     return $this;
   }
   
-  public function getPlatformName() {
-    return $this->platformName;
+  public function getBranchName() {
+    return $this->branchName;
   }
   
-  public function setPlatformName($name) {
-    $this->platformName = $name;
-    return $this;
-  }
-  
-  public function getHasFile() {
-    return $this->hasFile;
-  }
-  
-  public function setHasFile($has_file) {
-    $this->hasFile = $has_file;
+  public function setBranchName($name) {
+    $this->branchName = $name;
     return $this;
   }
   
@@ -73,27 +63,21 @@ final class VersionModel {
     $mappings = array(
       'googleID' => $this->getGoogleID(),
       'packageName' => $this->getPackageName(),
-      'platformName' => $this->getPlatformName(),
+      'branchName' => $this->getBranchName(),
       'versionName' => $this->getVersionName(),
-      'hasFile' => $this->getHasFile(),
     );
     
     $indexes = array(
       'googleID' => true,
-      'platformName' => true,
+      'branchName' => true,
       'packageName' => true,
-      'versionName' => true,
     );
     
     $results = array();
     
     foreach ($mappings as $name => $value) {
       $prop = new Google_Service_Datastore_Property();
-      if ($name === 'hasFile') {
-        $prop->setBooleanValue($value);
-      } else {
-        $prop->setStringValue($value);
-      }
+      $prop->setStringValue($value);
       $prop->setIndexed(array_key_exists($name, $indexes));
       
       $results[$name] = $prop;
@@ -107,15 +91,13 @@ final class VersionModel {
     
     $props_googleID = idx($props, 'googleID');
     $props_packageName = idx($props, 'packageName');
-    $props_platformName = idx($props, 'platformName');
+    $props_branchName = idx($props, 'branchName');
     $props_versionName = idx($props, 'versionName');
-    $props_hasFile = idx($props, 'hasFile');
     
     $value_googleID = null;
     $value_packageName = null;
-    $value_platformName = null;
+    $value_branchName = null;
     $value_versionName = null;
-    $value_hasFile = false;
     
     if ($props_googleID !== null) {
       $value_googleID = $props_googleID->getStringValue();
@@ -125,25 +107,20 @@ final class VersionModel {
       $value_packageName = $props_packageName->getStringValue();
     }
     
-    if ($props_platformName !== null) {
-      $value_platformName = $props_platformName->getStringValue();
+    if ($props_branchName !== null) {
+      $value_branchName = $props_branchName->getStringValue();
     }
     
     if ($props_versionName !== null) {
       $value_versionName = $props_versionName->getStringValue();
     }
     
-    if ($props_hasFile !== null) {
-      $value_hasFile = $props_hasFile->getBooleanValue();
-    }
-    
     $model
       ->setKey(head($entity->getKey()->getPath())->getId())
       ->setGoogleID($value_googleID)
       ->setPackageName($value_packageName)
-      ->setPlatformName($value_platformName)
-      ->setVersionName($value_versionName)
-      ->setHasFile($value_hasFile);
+      ->setBranchName($value_branchName)
+      ->setVersionName($value_versionName);
       
     return $model;
   }
@@ -221,7 +198,7 @@ final class VersionModel {
     $name_arg->setValue($name_value);
     
     $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM version WHERE googleID = @id AND packageName = @name');
+    $gql_query->setQueryString('SELECT * FROM branch WHERE googleID = @id AND packageName = @name');
     $gql_query->setNameArgs(array($id_arg, $name_arg));
     
     $query = new Google_Service_Datastore_RunQueryRequest();
@@ -242,112 +219,9 @@ final class VersionModel {
       
       $results[] = self::unmapProperties(
         $entity,
-        id(new VersionModel()));
+        id(new BranchModel()));
     }
     
     return $results;
-  }
-  
-  public function loadByPackagePlatformAndVersion(
-    GoogleToUserMappingModel $user,
-    PackageModel $package,
-    $platform,
-    $version) {
-    
-    $id_value = new Google_Service_Datastore_Value();
-    $id_value->setStringValue($user->getGoogleID());
-    
-    $id_arg = new Google_Service_Datastore_GqlQueryArg();
-    $id_arg->setName('id');
-    $id_arg->setValue($id_value);
-    
-    $name_value = new Google_Service_Datastore_Value();
-    $name_value->setStringValue($package->getName());
-    
-    $name_arg = new Google_Service_Datastore_GqlQueryArg();
-    $name_arg->setName('name');
-    $name_arg->setValue($name_value);
-    
-    $platform_value = new Google_Service_Datastore_Value();
-    $platform_value->setStringValue($platform);
-    
-    $platform_arg = new Google_Service_Datastore_GqlQueryArg();
-    $platform_arg->setName('platform');
-    $platform_arg->setValue($platform_value);
-    
-    $version_value = new Google_Service_Datastore_Value();
-    $version_value->setStringValue($version);
-    
-    $version_arg = new Google_Service_Datastore_GqlQueryArg();
-    $version_arg->setName('version');
-    $version_arg->setValue($version_value);
-    
-    $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM version WHERE googleID = @id AND packageName = @name AND platformName = @platform AND versionName = @version');
-    $gql_query->setNameArgs(array($id_arg, $name_arg, $platform_arg, $version_arg));
-    
-    $query = new Google_Service_Datastore_RunQueryRequest();
-    $query->setGqlQuery($gql_query);
-    
-    $dataset = $this->datastore->datasets;
-    $dataset_id = "protobuild-index";
-    
-    $result = $dataset->runQuery($dataset_id, $query);
-    
-    $batch = $result->getBatch();
-    $entities = $batch->getEntityResults();
-    
-    if (count($entities) === 0) {
-      return null;
-    }
-    
-    $entity = head($entities);
-    $entity = $entity->getEntity();
-    
-    self::unmapProperties($entity, $this);
-    
-    return $this;
-  }
-  
-  public function loadByKey($key_id) {
-    $path = new Google_Service_Datastore_KeyPathElement();
-    $path->setKind(self::KIND);
-    $path->setId($key_id);
-    
-    $key = new Google_Service_Datastore_Key();
-    $key->setPath(array($path));
-    
-    $id_value = new Google_Service_Datastore_Value();
-    $id_value->setKeyValue($key);
-    
-    $id_arg = new Google_Service_Datastore_GqlQueryArg();
-    $id_arg->setName('key');
-    $id_arg->setValue($id_value);
-    
-    $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM version WHERE __key__ = @key');
-    $gql_query->setNameArgs(array($id_arg));
-    
-    $query = new Google_Service_Datastore_RunQueryRequest();
-    $query->setGqlQuery($gql_query);
-    
-    $dataset = $this->datastore->datasets;
-    $dataset_id = "protobuild-index";
-    
-    $result = $dataset->runQuery($dataset_id, $query);
-    
-    $batch = $result->getBatch();
-    $entities = $batch->getEntityResults();
-    
-    if (count($entities) === 0) {
-      return null;
-    }
-    
-    $entity = head($entities);
-    $entity = $entity->getEntity();
-    
-    self::unmapProperties($entity, $this);
-    
-    return $this;
   }
 }

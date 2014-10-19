@@ -34,13 +34,18 @@ final class IndexPlatformsController extends ProtobuildController {
     header('Content-Type: text/plain');
     
     $versions = id(new VersionModel())->loadAllForPackage($user, $package);
+    $branches = id(new BranchModel())->loadAllForPackage($user, $package);
+    $branches = mpull($branches, 'getVersionName', 'getBranchName');
+    
+    $resolved_name = idx($data, 'version');
+    $resolved_name = idx($branches, $resolved_name, $resolved_name);
     
     if (count($versions) !== 0) {
       $versions_grouped = mgroup($versions, 'getVersionName');
       $versions_items = array();
       
       foreach ($versions_grouped as $version_name => $version_platforms) {
-        if ($version_name !== idx($data, 'version')) {
+        if ($version_name !== $resolved_name) {
           continue;
         }
         
