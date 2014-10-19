@@ -4,6 +4,7 @@ final class Panel extends Control {
   
   private $heading;
   private $noBody = false;
+  private $type;
   
   public function setHeading($heading) {
     $this->heading = $heading;
@@ -12,6 +13,11 @@ final class Panel extends Control {
   
   public function setNoBody($no_body) {
     $this->noBody = $no_body;
+    return $this;
+  }
+  
+  public function setType($type) {
+    $this->type = $type;
     return $this;
   }
   
@@ -34,9 +40,14 @@ final class Panel extends Control {
         $this->renderChildren());
     }
     
+    $type = 'default';
+    if ($this->type !== null) {
+      $type = $this->type;
+    }
+    
     return phutil_tag(
       'div',
-      array('class' => 'panel panel-default'),
+      array('class' => 'panel panel-'.$type),
       array(
         $heading,
         $body));

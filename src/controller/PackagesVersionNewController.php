@@ -7,24 +7,9 @@ final class PackagesVersionNewController extends ProtobuildController {
   }
   
   public function processRequest(array $data) {
-    
-    $current_name = idx($data, 'name');
-    
-    $user = $this->getUser();
-    
-    $package = id(new PackageModel())
-      ->loadByUserAndName($user, $current_name);
-    
-    if ($package === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
-    }
-    
-    $breadcrumbs = new Breadcrumbs();
-    $breadcrumbs->addBreadcrumb('Package Index', '/index');
-    $breadcrumbs->addBreadcrumb('Manage', '/packages/manage');
-    $breadcrumbs->addBreadcrumb($current_name, '/'.$user->getUser().'/'.$current_name);
+    list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
+
+    $breadcrumbs = $this->createBreadcrumbs($user, $package);
     $breadcrumbs->addBreadcrumb('Create New Version');
     
     $error_version = null;
@@ -67,7 +52,7 @@ final class PackagesVersionNewController extends ProtobuildController {
           ->setVersionName($value_version)
           ->create();
         
-        header('Location: /packages/version/upload/'.$version->getKey());
+        header('Location: '.$package->getURI($user, 'version/upload/'.$version->getKey()));
         die();
       }
     }

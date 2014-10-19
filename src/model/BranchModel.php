@@ -179,6 +179,26 @@ final class BranchModel {
     $dataset->commit($dataset_id, $req);
   }
   
+  public function delete() {
+    $path = new Google_Service_Datastore_KeyPathElement();
+    $path->setKind(self::KIND);
+    $path->setId($this->getKey());
+
+    $key = new Google_Service_Datastore_Key();
+    $key->setPath(array($path));
+
+    $mutation = new Google_Service_Datastore_Mutation();
+    $mutation->setDelete(array($key));
+    $req = new Google_Service_Datastore_CommitRequest();
+    $req->setMode('NON_TRANSACTIONAL');
+    $req->setMutation($mutation);
+    
+    $dataset = $this->datastore->datasets;
+    $dataset_id = "protobuild-index";
+    
+    $dataset->commit($dataset_id, $req);
+  }
+  
   public function loadAllForPackage(
     GoogleToUserMappingModel $user,
     PackageModel $package) {

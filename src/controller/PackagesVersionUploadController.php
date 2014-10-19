@@ -7,6 +7,7 @@ final class PackagesVersionUploadController extends ProtobuildController {
   }
   
   public function processRequest(array $data) {
+    list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     
     $current_id = idx($data, 'id');
     $version = id(new VersionModel())
@@ -18,15 +19,10 @@ final class PackagesVersionUploadController extends ProtobuildController {
       die();
     }
     
-    $user = id(new GoogleToUserMappingModel())
-      ->load($version->getGoogleID());
-    
-    $can_edit = 
-      $this->getUser() !== null && 
-      $this->getUser()->getUser() === $user->getUser();
-    
-    if (!$can_edit) {
+    if ($user->getGoogleID() !== $version->getGoogleID()) {
       // TODO Show 404 user not found
+      // This happens if you use an upload ID for a different
+      // user than the one you're looking at
       header('Location: /index');
       die();
     }
@@ -65,10 +61,7 @@ final class PackagesVersionUploadController extends ProtobuildController {
       die('Marked file as present');
     }
     
-    $breadcrumbs = new Breadcrumbs();
-    $breadcrumbs->addBreadcrumb('Package Index', '/index');
-    $breadcrumbs->addBreadcrumb('Manage', '/packages/manage');
-    $breadcrumbs->addBreadcrumb($package->getName(), '/'.$user->getUser().'/'.$package->getName());
+    $breadcrumbs = $this->createBreadcrumbs($user, $package);
     $breadcrumbs->addBreadcrumb('Upload Package File');
     
     $resume_uri = id(new ResumableUpload())->getResumableURI($filename);

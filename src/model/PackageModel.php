@@ -59,6 +59,14 @@ final class PackageModel {
     return $this;
   }
   
+  public function getURI(GoogleToUserMappingModel $owner, $path = null) {
+    if ($path === null) {
+      return '/'.$owner->getUser().'/'.$this->getName();
+    } else {
+      return '/'.$owner->getUser().'/'.$this->getName().'/'.$path;
+    }
+  }
+  
   public function getFormattedDescription() {
     $html = array();
     $lines = phutil_split_lines($this->description);

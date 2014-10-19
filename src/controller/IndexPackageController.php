@@ -7,28 +7,12 @@ final class IndexPackageController extends ProtobuildController {
   } 
  
   public function processRequest(array $data) {
+    list($user, $package) = $this->loadOwnerAndPackageFromRequest($data);
     
-    $username = idx($data, 'user');
-    $name = idx($data, 'name');
     $platform_name = idx($data, 'platform');
     $version_name = idx($data, 'version');
     
-    if ($username === null || $name === null || $platform_name === null || $version_name === null) {
-      // TODO 404
-      die();
-    }
-    
-    $user = id(new GoogleToUserMappingModel())
-      ->loadByName($username);
-    
-    if ($user === null) {
-      // TODO 404
-      die();
-    }
-    
-    $package = id(new PackageModel())->loadByUserAndName($user, $name);
-    
-    if ($package === null) {
+    if ($platform_name === null || $version_name === null) {
       // TODO 404
       die();
     }

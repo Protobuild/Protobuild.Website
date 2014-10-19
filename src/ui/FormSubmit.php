@@ -11,7 +11,7 @@ final class FormSubmit extends Control {
   
   public function render() {
     return hsprintf(<<<EOF
-<button type="submit" class="btn btn-default">%s</button>
+<button type="submit" class="btn btn-default" name="__submit__">%s</button>
 EOF
     , $this->text);
   }

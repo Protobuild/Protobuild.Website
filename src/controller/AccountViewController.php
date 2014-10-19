@@ -12,7 +12,7 @@ final class AccountViewController extends ProtobuildController {
   
   public function processRequest(array $data) {
     
-    $username = idx($data, 'user');
+    $username = idx($data, 'owner');
     
     if ($username === null) {
       // TODO Show 404 user not found
@@ -29,9 +29,7 @@ final class AccountViewController extends ProtobuildController {
       die();
     }
     
-    $breadcrumbs = new Breadcrumbs();
-    $breadcrumbs->addBreadcrumb('Package Index', '/index');
-    $breadcrumbs->addBreadcrumb($user->getUser());
+    $breadcrumbs = $this->createBreadcrumbs($user);
     
     $packages = id(new PackageModel())->loadAllForUser($user);
     
@@ -69,9 +67,25 @@ final class AccountViewController extends ProtobuildController {
       $content = $items;
     }
     
+    $new_package = null;
+    if ($this->canEdit($user)) {
+      $new_package = phutil_tag(
+        'a',
+        array(
+          'type' => 'button',
+          'class' => 'btn btn-primary',
+          'href' => '/packages/new'
+        ),
+        'New Package'
+      );
+      
+      $new_package = phutil_tag('p', array(), $new_package);
+    }
+    
     return $this->buildApplicationPage(array(
       $breadcrumbs,
       $content,
+      $new_package,
     ));
   }
   

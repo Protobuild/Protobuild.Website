@@ -39,6 +39,14 @@ final class GoogleToUserMappingModel {
     return $this;
   }
   
+  public function getURI($path = null) {
+    if ($path === null) {
+      return '/'.$this->getUser();
+    } else {
+      return '/'.$this->getUser().'/'.$path;
+    } 
+  }
+  
   public function create() {
     $path = new Google_Service_Datastore_KeyPathElement();
     $path->setKind(self::KIND);

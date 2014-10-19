@@ -7,29 +7,7 @@ final class IndexIndexController extends ProtobuildController {
   }
   
   public function processRequest(array $data) {
-    
-    $username = idx($data, 'user');
-    $name = idx($data, 'name');
-    
-    if ($username === null || $name === null) {
-      // TODO 404
-      die();
-    }
-    
-    $user = id(new GoogleToUserMappingModel())
-      ->loadByName($username);
-    
-    if ($user === null) {
-      // TODO 404
-      die();
-    }
-    
-    $package = id(new PackageModel())->loadByUserAndName($user, $name);
-    
-    if ($package === null) {
-      // TODO 404
-      die();
-    }
+    list($user, $package) = $this->loadOwnerAndPackageFromRequest($data);
     
     header('Content-Type: text/plain');
     echo $package->getGitURL()."\r\n";

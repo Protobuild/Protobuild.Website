@@ -7,11 +7,10 @@ final class PackagesEditController extends ProtobuildController {
   }
   
   public function processRequest(array $data) {
+    $user = $this->loadOwnerAndEnforceRequireEditFromRequest($data);
     
-    $current_name = idx($data, 'name');
+    $current_name = idx($data, 'package');
     $is_new = $current_name === null;
-    
-    $user = $this->getUser();
     
     $error_name = null;
     $error_git = null;
@@ -35,9 +34,7 @@ final class PackagesEditController extends ProtobuildController {
       }
     }
     
-    $breadcrumbs = new Breadcrumbs();
-    $breadcrumbs->addBreadcrumb('Package Index', '/index');
-    $breadcrumbs->addBreadcrumb('Manage', '/packages/manage');
+    $breadcrumbs = $this->createBreadcrumbs($user);
     $breadcrumbs->addBreadcrumb($is_new ? 'New' : 'Edit '.$current_name);
     
     $success = idx($_GET, 'success', 'false') === 'true';
