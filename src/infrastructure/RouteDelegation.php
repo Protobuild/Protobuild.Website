@@ -18,9 +18,12 @@ final class RouteDelegation {
       
       // Viewing users and packages
       '/(?P<owner>[^/]+)(/?)' => 'AccountViewController',
-      '/(?P<owner>[^/]+)/rename(/?)' => 'AccountRenameController',
-      '/(?P<owner>[^/]+)/new(/?)' => 'PackagesEditController',
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)(/?)' => 'PackagesViewController',
+      
+      // Account admin
+      '/(?P<owner>[^/]+)/rename(/?)' => 'AccountRenameController',
+      '/(?P<owner>[^/]+)/owner/add(/?)' => 'OwnershipAddController',
+      '/(?P<owner>[^/]+)/new(/?)' => 'PackagesEditController',
       
       // Package admin
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/edit(/?)' => 'PackagesEditController',

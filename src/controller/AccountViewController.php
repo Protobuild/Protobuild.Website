@@ -67,6 +67,33 @@ final class AccountViewController extends ProtobuildController {
       $content = $items;
     }
     
+    $owners_list = null;
+    if ($user->getIsOrganisation()) {
+      $owners_list = array();
+      
+      $owners = id(new OwnershipModel())
+        ->loadOwnersForOrganisationGoogleID($user->getGoogleID());
+      $owners = mpull($owners, 'getOwnerGoogleID');
+      
+      foreach ($owners as $owner) {
+        // TODO Remove N+1
+        $owner = id(new UserModel())
+          ->load($owner);
+        $owners_list[] = phutil_tag(
+          'li',
+          array(),
+          phutil_tag(
+            'a',
+            array('href' => $owner->getURI()),
+            $owner->getCanonicalName()));
+      }
+      
+      $owners_list = array(
+        phutil_tag('h3', array(), 'Organisation Owners'),
+        phutil_tag('p', array(), 'This organisation is owned by:'),
+        phutil_tag('ul', array(), $owners_list));
+    }
+    
     $buttons = array();
     
     if ($this->canEdit($user)) {
@@ -89,32 +116,57 @@ final class AccountViewController extends ProtobuildController {
         ),
         'Rename Account'
       );
+      
+      if ($user->getIsOrganisation()) {
+        $buttons[] = phutil_tag(
+          'a',
+          array(
+            'type' => 'button',
+            'class' => 'btn btn-default',
+            'href' => $user->getURI('owner/add'),
+          ),
+          'Add Owner'
+        );
+        
+        $buttons[] = phutil_tag(
+          'a',
+          array(
+            'type' => 'button',
+            'class' => 'btn btn-default',
+            'disabled' => 'disabled',
+          ),
+          'Edit Owners'
+        );
+      } else {
+        // Only show New Organisation when we're look at our own account.
+        $buttons[] = phutil_tag(
+          'a',
+          array(
+            'type' => 'button',
+            'class' => 'btn btn-default',
+            'href' => '/organisation/new'
+          ),
+          'New Organisation'
+        );
+      }
     }
     
     if ($this->getUser() !== null && 
       $user->getUniqueName() === $this->getUser()->getUniqueName()) {
-      
-      // Only show New Organisation when we're look at our own account.
-      $buttons[] = phutil_tag(
-        'a',
-        array(
-          'type' => 'button',
-          'class' => 'btn btn-default',
-          'href' => '/organisation/new'
-        ),
-        'New Organisation'
-      );
     }
     
-    $buttons = array(
-      phutil_tag('div', array('class' => 'btn-group'), array(
-        $buttons)),
-      phutil_tag('br', array(), null),
-      phutil_tag('br', array(), null));
+    if (count($buttons) > 0) {
+      $buttons = array(
+        phutil_tag('div', array('class' => 'btn-group'), array(
+          $buttons)),
+        phutil_tag('br', array(), null),
+        phutil_tag('br', array(), null));
+    }
         
     return $this->buildApplicationPage(array(
       $breadcrumbs,
       $content,
+      $owners_list,
       $buttons,
     ));
   }
