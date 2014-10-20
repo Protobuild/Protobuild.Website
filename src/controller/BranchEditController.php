@@ -36,45 +36,49 @@ final class BranchEditController extends ProtobuildController {
     $breadcrumbs = $this->createBreadcrumbs($user, $package);
     $breadcrumbs->addBreadcrumb($is_new ? 'New Branch' : 'Edit Branch');
     
+    $versions = id(new VersionModel())->loadAllForPackage($user, $package);
+    $versions = mpull($versions, 'getVersionName', 'getVersionName');
+    
     if (isset($_POST['name'])) {  
       $value_name = $_POST['name'];
       $value_git = $_POST['git'];
       
-      $existing = id(new BranchModel())
-        ->loadAllForPackage($user, $package);
-      $existing = mpull($existing, null, 'getBranchName');
-      $existing = idx($existing, $value_name);
-      
-      if ($existing === null || ($branch !== null && $value_name === $branch->getBranchName())) {
-        if (preg_match('/^[a-zA-Z0-9-]+$/', $value_git, $matches) === 1) {
-          
-          if ($branch === null) {
-            $new_branch = id(new BranchModel())
-              ->setGoogleID($this->getSession()->getUserID())
-              ->setPackageName($package->getName())
-              ->setBranchName($value_name)
-              ->setVersionName($value_git)
-              ->create();
-          } else {
-            $branch
-              ->setBranchName($value_name)
-              ->setVersionName($value_git)
-              ->update();
-          }
-          
-          header('Location: /'.$user->getUser().'/'.$package->getName().'?branch=true');
-          die();
-        } else {
-          $error_name = 
-            'Branch names can only contain letters, numbers and dashes';
-        } 
+      if (idx($versions, $value_git) === null) {
+        $error_git = 'The specified version does not exist';
       } else {
-        $error_name = 'You already have a branch with the same name';
+        $existing = id(new BranchModel())
+          ->loadAllForPackage($user, $package);
+        $existing = mpull($existing, null, 'getBranchName');
+        $existing = idx($existing, $value_name);
+        
+        if ($existing === null || ($branch !== null && $value_name === $branch->getBranchName())) {
+          if (preg_match('/^[a-zA-Z0-9-]+$/', $value_git, $matches) === 1) {
+            
+            if ($branch === null) {
+              $new_branch = id(new BranchModel())
+                ->setGoogleID($this->getSession()->getUserID())
+                ->setPackageName($package->getName())
+                ->setBranchName($value_name)
+                ->setVersionName($value_git)
+                ->create();
+            } else {
+              $branch
+                ->setBranchName($value_name)
+                ->setVersionName($value_git)
+                ->update();
+            }
+            
+            header('Location: /'.$user->getUser().'/'.$package->getName().'?branch=true');
+            die();
+          } else {
+            $error_name = 
+              'Branch names can only contain letters, numbers and dashes';
+          } 
+        } else {
+          $error_name = 'You already have a branch with the same name';
+        }
       }
     }
-    
-    $versions = id(new VersionModel())->loadAllForPackage($user, $package);
-    $versions = mpull($versions, 'getVersionName', 'getVersionName');
     
     $form = id(new Panel())
       ->appendChild(id(new Form())

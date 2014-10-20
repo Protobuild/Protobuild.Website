@@ -39,7 +39,7 @@ final class FormSelectInput extends FormControl {
         'class' => 'form-control',
         'id' => $this->getName(),
         'name' => $this->getName(),
-      ),
+      ) + $this->getDisabledArray(),
       $options
     );
   }

@@ -7,10 +7,14 @@ final class PackagesEditController extends ProtobuildController {
   }
   
   public function processRequest(array $data) {
-    $user = $this->loadOwnerAndEnforceRequireEditFromRequest($data);
-    
     $current_name = idx($data, 'package');
     $is_new = $current_name === null;
+    
+    if ($is_new) {
+      $user = $this->loadOwnerFromRequestAndRequireEdit($data);
+    } else {
+      list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
+    }
     
     $error_name = null;
     $error_git = null;
@@ -19,6 +23,11 @@ final class PackagesEditController extends ProtobuildController {
     $value_name = null;
     $value_git = null;
     $value_desc = null;
+    
+    $caption_name = '';
+    if (!$is_new) {
+      $caption_name = 'Packages can not be renamed after they are created.';
+    }
     
     $current = null;
     if (!$is_new) {
@@ -37,10 +46,15 @@ final class PackagesEditController extends ProtobuildController {
     $breadcrumbs = $this->createBreadcrumbs($user);
     $breadcrumbs->addBreadcrumb($is_new ? 'New' : 'Edit '.$current_name);
     
-    $success = idx($_GET, 'success', 'false') === 'true';
-    
-    if (isset($_POST['name'])) {  
-      $value_name = $_POST['name'];
+    $success = false;
+    if (isset($_POST['__submit__'])) {  
+      
+      if ($is_new) {
+        $value_name = $_POST['name'];
+      } else {
+        $value_name = $current->getName();
+      } 
+      
       $value_git = $_POST['git'];
       $value_desc = $_POST['desc'];
       
@@ -63,18 +77,10 @@ final class PackagesEditController extends ProtobuildController {
             die();
               
           } else {
-            $changed_name = $current->getName() !== $value_name;
-            
             $current
-              ->setName($value_name)
               ->setGitURL($value_git)
               ->setDescription($value_desc);
             $current->update();
-            
-            if ($changed_name) {
-              header('Location: /packages/edit/'.$value_name.'?success=true');
-              die();
-            }
           }
           
           $success = true;
@@ -102,38 +108,33 @@ final class PackagesEditController extends ProtobuildController {
             '  Your package has been saved successfully.'));
     }
     
-    $form = <<<EOF
-<div class="panel panel-default">
-  <div class="panel-body">
-    <form role="form" method="POST">
-      <div class="form-group %s">
-        <label class="control-label" for="name">Package Name%s</label>
-        <input type="text" class="form-control" id="name" name="name" placeholder="Enter package name (letters, numbers, dashes and dots only)" value="%s">
-      </div>
-      <div class="form-group">
-        <label class="control-label" for="git">Git Source URL</label>
-        <input type="text" class="form-control" id="git" name="git" placeholder="Full URL to the Git repository (optional)" value="%s">
-      </div>
-      <div class="form-group">
-        <label class="control-label" for="desc">Description</label>
-        <textarea class="form-control" id="desc" name="desc" rows="6">%s</textarea>
-      </div>
-      <p>
-        You will be able to upload binaries for your package after creating it.
-      </p>
-      <button type="submit" class="btn btn-default">Save</button>
-    </form>
-  </div>
-</div>
-EOF
-;
-    $form = hsprintf(
-      $form,
-      $error_name !== null ? 'has-error' : '',
-      $error_name !== null ? (' ('.$error_name.')') : '',
-      $value_name,
-      $value_git,
-      $value_desc);
+    $form = id(new Panel())
+      ->appendChild(id(new Form())
+        ->appendChild(id(new FormTextInput())
+          ->setName('name')
+          ->setLabel('Package Name')
+          ->setValue($value_name)
+          ->setError($error_name)
+          ->setPlaceholder('Enter package name (letters, numbers, dashes and dots only)')
+          ->setDisabled(!$is_new)
+          ->setCaption($caption_name))
+        ->appendChild(id(new FormTextInput())
+          ->setName('git')
+          ->setLabel('Git Source URL')
+          ->setValue($value_git)
+          ->setError($error_git)
+          ->setPlaceholder('Full URL to the Git repository (optional)'))
+        ->appendChild(id(new FormTextareaInput())
+          ->setName('desc')
+          ->setLabel('Description')
+          ->setValue($value_desc)
+          ->setError($error_desc))
+        ->appendChild(phutil_tag(
+          'p',
+          array(),
+          'You will be able to upload a package file after creating your package.'))
+        ->appendChild(id(new FormSubmit())
+          ->setText('Save')));
     
     return $this->buildApplicationPage(array(
       $breadcrumbs,

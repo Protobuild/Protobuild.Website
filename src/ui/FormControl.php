@@ -6,6 +6,7 @@ abstract class FormControl extends Control {
   private $label;
   private $error;
   private $caption;
+  private $disabled;
   
   public function setName($name) {
     $this->name = $name;
@@ -14,6 +15,23 @@ abstract class FormControl extends Control {
   
   public function getName() {
     return $this->name;
+  }
+  
+  public function setDisabled($disabled) {
+    $this->disabled = $disabled;
+    return $this;
+  }
+  
+  public function getDisabled() {
+    return $this->disabled;
+  }
+  
+  protected function getDisabledArray() {
+    if ($this->disabled) {
+      return array('disabled' => 'disabled');
+    } else {
+      return array();
+    }
   }
   
   public function setLabel($label) {

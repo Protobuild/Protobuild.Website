@@ -53,11 +53,10 @@ abstract class ProtobuildController extends Phobject {
     return $user;
   }
   
-  protected function loadOwnerAndPackageFromRequest(array $data) {
+  protected function loadOwnerFromRequest(array $data) {
     $owner_name = idx($data, 'owner');
-    $package_name = idx($data, 'package');
     
-    if ($owner_name === null || $package_name === null) {
+    if ($owner_name === null) {
       // TODO Show 404 user not found
       header('Location: /index');
       die();
@@ -67,6 +66,20 @@ abstract class ProtobuildController extends Phobject {
       ->loadByName($owner_name);
     
     if ($owner === null) {
+      // TODO Show 404 user not found
+      header('Location: /index');
+      die();
+    }
+    
+    return $owner;
+  }
+  
+  protected function loadOwnerAndPackageFromRequest(array $data) {
+    $owner = $this->loadOwnerFromRequest($data);
+    
+    $package_name = idx($data, 'package');
+    
+    if ($package_name === null) {
       // TODO Show 404 user not found
       header('Location: /index');
       die();
@@ -82,6 +95,14 @@ abstract class ProtobuildController extends Phobject {
     }
     
     return array($owner, $package);
+  }
+  
+  protected function loadOwnerFromRequestAndRequireEdit(array $data) {
+    list($owner, $package) = $this->loadOwnerFromRequest($data);
+    
+    $this->enforceRequireEdit($owner);
+    
+    return $owner;
   }
   
   protected function loadOwnerAndPackageFromRequestAndRequireEdit(array $data) {
