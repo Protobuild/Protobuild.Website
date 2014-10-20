@@ -39,6 +39,7 @@ EOF;
       $prefix = 'mono ';
     }
 
+    $allow_delete = false;
     $add_module = hsprintf(
       $add_module,
       $prefix.'Protobuild.exe --add http://protobuild.org'.$package->getURI($user));
@@ -60,7 +61,19 @@ EOF
     $branches = id(new BranchModel())->loadAllForPackage($user, $package);
     $branches = mpull($branches, null, 'getBranchName');
     
-    if (count($versions) === 0) {
+    if (count($versions) === 0 && strlen($package->getGitURL()) === 0) {
+      $add_module = id(new Panel())
+        ->setType('danger')
+        ->setHeading('No source URL or binaries present')
+        ->appendChild(
+          'This package can not be added to any projects as there is no '.
+          'Git source URL configured, and no binary packages have been '.
+          'uploaded.');
+    }
+    
+    if (count($versions) === 0 && count($branches) === 0) {
+      $allow_delete = true;
+      
       $versions_html = array(
         phutil_tag('h3', array(), 'Binary Versions'),
         hsprintf(<<<EOF
@@ -91,12 +104,26 @@ EOF
           );
         }
         
+        $message = 'Branch pointing to '.$branch->getVersionName().'.';
+        $message = phutil_tag('p', array(), $message);
+        if (idx($versions_grouped, $branch->getVersionName()) === null) {
+          $message = array(
+            $message,
+            phutil_tag(
+              'p',
+              array(),
+              phutil_tag(
+                'strong',
+                array(),
+                'WARNING: The commit this branch points to is missing!')));
+        }
+        
         $branches_items[] = id(new Panel())
           ->setHeading($branch->getBranchName(). ' (branch)')
           ->setType('success')
           ->appendChild(
             array(
-              phutil_tag('p', array(), 'Branch pointing to '.$branch->getVersionName().'.'),
+              $message,
               $links
             ));
       }
@@ -118,6 +145,12 @@ EOF
                 array('class' => 'badge'),
                 'Binary Missing');
               $target = $package->getURI($user, 'version/upload/'.$platform_entry->getKey());
+            } else {
+              $badge = phutil_tag(
+                'span',
+                array('class' => 'badge'),
+                'Delete');
+              $target = $package->getURI($user, 'version/delete/'.$platform_entry->getKey());
             }
           }
           
@@ -161,16 +194,6 @@ EOF
         $versions_items);
     }
     
-    $edit_package = phutil_tag(
-      'a',
-      array(
-        'type' => 'button',
-        'class' => 'btn btn-default',
-        'href' => $package->getURI($user, 'edit'),
-      ),
-      'Edit Package'
-    );
-    
     $upload_version = phutil_tag(
       'a',
       array(
@@ -191,12 +214,36 @@ EOF
       'New Branch'
     );
     
+    $edit_package = phutil_tag(
+      'a',
+      array(
+        'type' => 'button',
+        'class' => 'btn btn-default',
+        'href' => $package->getURI($user, 'edit'),
+      ),
+      'Edit Package'
+    );
+    
+    $delete_package = null;
+    if ($allow_delete) {
+      $delete_package = phutil_tag(
+        'a',
+        array(
+          'type' => 'button',
+          'class' => 'btn btn-danger',
+          'href' => $package->getURI($user, 'delete'),
+        ),
+        'Delete Package'
+      );
+    }
+    
     if ($can_edit) {
       $buttons = array(
         phutil_tag('div', array('class' => 'btn-group'), array(
           $upload_version,
           $new_branch,
-          $edit_package)),
+          $edit_package,
+          $delete_package)),
         phutil_tag('br', array(), null),
         phutil_tag('br', array(), null));
     } else {

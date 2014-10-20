@@ -19,19 +19,12 @@ final class PackagesVersionUploadController extends ProtobuildController {
       die();
     }
     
-    if ($user->getGoogleID() !== $version->getGoogleID()) {
+    if ($user->getGoogleID() !== $version->getGoogleID() ||
+      $package->getName() !== $version->getPackageName()) {
+      
       // TODO Show 404 user not found
       // This happens if you use an upload ID for a different
       // user than the one you're looking at
-      header('Location: /index');
-      die();
-    }
-    
-    $package = id(new PackageModel())
-      ->loadByUserAndName($user, $version->getPackageName());
-    
-    if ($package === null) {
-      // TODO Show 404 user not found
       header('Location: /index');
       die();
     }

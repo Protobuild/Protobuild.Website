@@ -23,10 +23,12 @@ final class RouteDelegation {
       
       // Package admin
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/edit(/?)' => 'PackagesEditController',
+      '/(?P<owner>[^/]+)/(?P<package>[^/]+)/delete(/?)' => 'PackagesDeleteController',
       
       // Version admin
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/version/new(/?)' => 'PackagesVersionNewController',
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/version/upload/(?P<id>[^/]+)(/?)' => 'PackagesVersionUploadController',
+      '/(?P<owner>[^/]+)/(?P<package>[^/]+)/version/delete/(?P<id>[^/]+)(/?)' => 'PackagesVersionDeleteController',
       
       // Branch admin
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/branch/new(/?)' => 'BranchEditController',
