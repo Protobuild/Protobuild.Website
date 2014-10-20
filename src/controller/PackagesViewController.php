@@ -213,6 +213,17 @@ EOF
       ),
       'New Branch'
     );
+    if (count($versions) === 0) {
+      $new_branch = phutil_tag(
+        'a',
+        array(
+          'type' => 'button',
+          'class' => 'btn btn-default',
+          'disabled' => 'disabled',
+        ),
+        'New Branch'
+      );
+    }
     
     $edit_package = phutil_tag(
       'a',

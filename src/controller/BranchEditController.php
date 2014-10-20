@@ -39,6 +39,12 @@ final class BranchEditController extends ProtobuildController {
     $versions = id(new VersionModel())->loadAllForPackage($user, $package);
     $versions = mpull($versions, 'getVersionName', 'getVersionName');
     
+    if (count($versions) === 0) {
+      // TODO show appropriate error
+      header('Location: '.$package->getURI($user));
+      die();
+    }
+    
     if (isset($_POST['name'])) {  
       $value_name = $_POST['name'];
       $value_git = $_POST['git'];
