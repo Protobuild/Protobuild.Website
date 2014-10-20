@@ -31,7 +31,7 @@ final class IndexPackageController extends ProtobuildController {
     if ($version === null) {
       // TODO 404
       header('Content-Type: text/plain');
-      echo $user->getUser()."\r\n".
+      echo $user->getCanonicalName()."\r\n".
         $package->getName()."\r\n".
         $platform_name."\r\n".
         $version_name."\r\n";

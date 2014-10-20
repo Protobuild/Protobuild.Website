@@ -223,7 +223,7 @@ final class VersionModel {
   }
   
   public function loadAllForPackage(
-    GoogleToUserMappingModel $user,
+    UserModel $user,
     PackageModel $package) {
     
     $id_value = new Google_Service_Datastore_Value();
@@ -269,7 +269,7 @@ final class VersionModel {
   }
   
   public function loadByPackagePlatformAndVersion(
-    GoogleToUserMappingModel $user,
+    UserModel $user,
     PackageModel $package,
     $platform,
     $version) {

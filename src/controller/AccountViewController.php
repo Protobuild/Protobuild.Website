@@ -20,7 +20,7 @@ final class AccountViewController extends ProtobuildController {
       die();
     }
     
-    $user = id(new GoogleToUserMappingModel())
+    $user = id(new UserModel())
       ->loadByName($username);
     
     if ($user === null) {
@@ -38,7 +38,7 @@ final class AccountViewController extends ProtobuildController {
         phutil_tag(
           'div', 
           array('class' => 'alert alert-warning', 'role' => 'alert'),
-          'This user hasn\'t uploaded any packages.');
+          'This '.$user->getTerm().' hasn\'t uploaded any packages.');
     } else {
       $items = array();
       
@@ -55,7 +55,7 @@ final class AccountViewController extends ProtobuildController {
                 array('class' => 'panel-title'),
                 phutil_tag(
                   'a',
-                  array('href' => '/'.$user->getUser().'/'.$package->getName()),
+                  array('href' => '/'.$user->getCanonicalName().'/'.$package->getName()),
                   $package->getName()))),
             phutil_tag(
               'div',
@@ -67,25 +67,55 @@ final class AccountViewController extends ProtobuildController {
       $content = $items;
     }
     
-    $new_package = null;
+    $buttons = array();
+    
     if ($this->canEdit($user)) {
-      $new_package = phutil_tag(
+      $buttons[] = phutil_tag(
         'a',
         array(
           'type' => 'button',
           'class' => 'btn btn-primary',
-          'href' => '/packages/new'
+          'href' => $user->getURI('new'),
         ),
         'New Package'
       );
       
-      $new_package = phutil_tag('p', array(), $new_package);
+      $buttons[] = phutil_tag(
+        'a',
+        array(
+          'type' => 'button',
+          'class' => 'btn btn-default',
+          'href' => $user->getURI('rename'),
+        ),
+        'Rename Account'
+      );
     }
     
+    if ($this->getUser() !== null && 
+      $user->getUniqueName() === $this->getUser()->getUniqueName()) {
+      
+      // Only show New Organisation when we're look at our own account.
+      $buttons[] = phutil_tag(
+        'a',
+        array(
+          'type' => 'button',
+          'class' => 'btn btn-default',
+          'href' => '/organisation/new'
+        ),
+        'New Organisation'
+      );
+    }
+    
+    $buttons = array(
+      phutil_tag('div', array('class' => 'btn-group'), array(
+        $buttons)),
+      phutil_tag('br', array(), null),
+      phutil_tag('br', array(), null));
+        
     return $this->buildApplicationPage(array(
       $breadcrumbs,
       $content,
-      $new_package,
+      $buttons,
     ));
   }
   

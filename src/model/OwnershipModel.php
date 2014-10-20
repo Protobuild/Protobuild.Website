@@ -1,14 +1,12 @@
 <?php
 
-final class BranchModel {
+final class OwnershipModel {
   
   private $key;
-  private $googleID;
-  private $packageName;
-  private $branchName;
-  private $versionName;
+  private $ownerGoogleID;
+  private $organisationGoogleID;
   
-  const KIND = 'branch';
+  const KIND = 'ownership';
   
   public function __construct() {
     $this->datastore = id(new GoogleService())->getGoogleCloudDatastore();
@@ -23,54 +21,33 @@ final class BranchModel {
     return $this;
   }
   
-  public function getGoogleID() {
-    return $this->googleID;
+  public function getOwnerGoogleID() {
+    return $this->ownerGoogleID;
   }
   
-  public function setGoogleID($googleID) {
-    $this->googleID = $googleID;
+  public function setOwnerGoogleID($googleID) {
+    $this->ownerGoogleID = $googleID;
     return $this;
   }
   
-  public function getPackageName() {
-    return $this->packageName;
+  public function getOrganisationGoogleID() {
+    return $this->organisationGoogleID;
   }
   
-  public function setPackageName($name) {
-    $this->packageName = $name;
-    return $this;
-  }
-  
-  public function getVersionName() {
-    return $this->versionName;
-  }
-  
-  public function setVersionName($name) {
-    $this->versionName = $name;
-    return $this;
-  }
-  
-  public function getBranchName() {
-    return $this->branchName;
-  }
-  
-  public function setBranchName($name) {
-    $this->branchName = $name;
+  public function setOrganisationGoogleID($googleID) {
+    $this->organisationGoogleID = $googleID;
     return $this;
   }
   
   private function mapProperties() {
     $mappings = array(
-      'googleID' => $this->getGoogleID(),
-      'packageName' => $this->getPackageName(),
-      'branchName' => $this->getBranchName(),
-      'versionName' => $this->getVersionName(),
+      'ownerGoogleID' => $this->getOwnerGoogleID(),
+      'organisationGoogleID' => $this->getOrganisationGoogleID(),
     );
     
     $indexes = array(
-      'googleID' => true,
-      'branchName' => true,
-      'packageName' => true,
+      'ownerGoogleID' => true,
+      'organisationGoogleID' => true,
     );
     
     $results = array();
@@ -89,38 +66,24 @@ final class BranchModel {
   private static function unmapProperties($entity, $model) {
     $props = $entity->getProperties();
     
-    $props_googleID = idx($props, 'googleID');
-    $props_packageName = idx($props, 'packageName');
-    $props_branchName = idx($props, 'branchName');
-    $props_versionName = idx($props, 'versionName');
+    $props_ownerGoogleID = idx($props, 'ownerGoogleID');
+    $props_organisationGoogleID = idx($props, 'organisationGoogleID');
     
-    $value_googleID = null;
-    $value_packageName = null;
-    $value_branchName = null;
-    $value_versionName = null;
+    $value_ownerGoogleID = null;
+    $value_organisationGoogleID = null;
     
-    if ($props_googleID !== null) {
-      $value_googleID = $props_googleID->getStringValue();
+    if ($props_ownerGoogleID !== null) {
+      $value_ownerGoogleID = $props_ownerGoogleID->getStringValue();
     }
     
-    if ($props_packageName !== null) {
-      $value_packageName = $props_packageName->getStringValue();
-    }
-    
-    if ($props_branchName !== null) {
-      $value_branchName = $props_branchName->getStringValue();
-    }
-    
-    if ($props_versionName !== null) {
-      $value_versionName = $props_versionName->getStringValue();
+    if ($props_organisationGoogleID !== null) {
+      $value_organisationGoogleID = $props_organisationGoogleID->getStringValue();
     }
     
     $model
       ->setKey(head($entity->getKey()->getPath())->getId())
-      ->setGoogleID($value_googleID)
-      ->setPackageName($value_packageName)
-      ->setBranchName($value_branchName)
-      ->setVersionName($value_versionName);
+      ->setOwnerGoogleID($value_ownerGoogleID)
+      ->setOrganisationGoogleID($value_organisationGoogleID);
       
     return $model;
   }
@@ -199,27 +162,17 @@ final class BranchModel {
     $dataset->commit($dataset_id, $req);
   }
   
-  public function loadAllForPackage(
-    UserModel $user,
-    PackageModel $package) {
-    
-    $id_value = new Google_Service_Datastore_Value();
-    $id_value->setStringValue($user->getGoogleID());
-    
-    $id_arg = new Google_Service_Datastore_GqlQueryArg();
-    $id_arg->setName('id');
-    $id_arg->setValue($id_value);
-    
+  public function loadOwnersForOrganisationGoogleID($google_id) {
     $name_value = new Google_Service_Datastore_Value();
-    $name_value->setStringValue($package->getName());
+    $name_value->setStringValue($google_id);
     
     $name_arg = new Google_Service_Datastore_GqlQueryArg();
     $name_arg->setName('name');
     $name_arg->setValue($name_value);
     
     $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM branch WHERE googleID = @id AND packageName = @name');
-    $gql_query->setNameArgs(array($id_arg, $name_arg));
+    $gql_query->setQueryString('SELECT * FROM ownership WHERE organisationGoogleID = @name');
+    $gql_query->setNameArgs(array($name_arg));
     
     $query = new Google_Service_Datastore_RunQueryRequest();
     $query->setGqlQuery($gql_query);
@@ -239,7 +192,7 @@ final class BranchModel {
       
       $results[] = self::unmapProperties(
         $entity,
-        id(new BranchModel()));
+        id(new OwnershipModel()));
     }
     
     return $results;

@@ -15,12 +15,12 @@ abstract class ProtobuildController extends Phobject {
     }
 
     if ($this->session->isAuthenticated()) {
-      $this->user = id(new GoogleToUserMappingModel())
+      $this->user = id(new UserModel())
         ->load($this->getSession()->getUserID());
       
       if ($this->requiresAccountName()) {
-        if ($this->user === null || $this->user->getUser() === null) {
-          header('Location: /account/name');
+        if ($this->user === null || $this->user->getCanonicalName() === null) {
+          header('Location: /'.$this->getSession()->getUserID().'/rename');
           die();
         }
       }
@@ -35,14 +35,24 @@ abstract class ProtobuildController extends Phobject {
     return $this->user;
   }
   
-  protected function canEdit(GoogleToUserMappingModel $target) {
-    return
-      $this->getUser() !== null && 
-      $this->getUser()->getUser() === $target->getUser();
+  protected function canEdit(UserModel $target) {
+    if ($this->getUser() === null) {
+      return false;
+    }
+    
+    if ($target->getIsOrganisation()) {
+      $owners = id(new OwnershipModel())
+        ->loadOwnersForOrganisationGoogleID($target->getGoogleID());
+      $owners = mpull($owners, 'getOwnerGoogleID', 'getOwnerGoogleID');
+      
+      return idx($owners, $this->getUser()->getGoogleID()) !== null;
+    } else {
+      return $this->getUser()->getUniqueName() === $target->getUniqueName();
+    }
   }
   
   protected function enforceRequireEdit(
-    GoogleToUserMappingModel $user) {
+    UserModel $user) {
     
     if (!$this->canEdit($user)) {
       // TODO Show 404 user not found
@@ -62,7 +72,7 @@ abstract class ProtobuildController extends Phobject {
       die();
     }
     
-    $owner = id(new GoogleToUserMappingModel())
+    $owner = id(new UserModel())
       ->loadByName($owner_name);
     
     if ($owner === null) {
@@ -98,7 +108,7 @@ abstract class ProtobuildController extends Phobject {
   }
   
   protected function loadOwnerFromRequestAndRequireEdit(array $data) {
-    list($owner, $package) = $this->loadOwnerFromRequest($data);
+    $owner = $this->loadOwnerFromRequest($data);
     
     $this->enforceRequireEdit($owner);
     
@@ -117,7 +127,7 @@ abstract class ProtobuildController extends Phobject {
     $breadcrumbs = new Breadcrumbs();
     $breadcrumbs->addBreadcrumb('Package Index', '/index');
     if ($user !== null) {
-      $breadcrumbs->addBreadcrumb($user->getUser(), $user->getURI());
+      $breadcrumbs->addBreadcrumb($user->getCanonicalName(), $user->getURI());
     }
     if ($user !== null && $package !== null) {
       $breadcrumbs->addBreadcrumb($package->getName(), $package->getURI($user));
@@ -182,7 +192,7 @@ abstract class ProtobuildController extends Phobject {
         phutil_tag(
           'a',
           array('href' => $this->getUser()->getURI()),
-          'Manage Packages'),
+          'My Account'),
         phutil_safe_html(' &bull; '),
         phutil_tag(
           'a',

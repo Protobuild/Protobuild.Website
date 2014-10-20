@@ -43,8 +43,13 @@ final class PackagesEditController extends ProtobuildController {
       }
     }
     
-    $breadcrumbs = $this->createBreadcrumbs($user);
-    $breadcrumbs->addBreadcrumb($is_new ? 'New' : 'Edit '.$current_name);
+    if ($is_new) {
+      $breadcrumbs = $this->createBreadcrumbs($user);
+      $breadcrumbs->addBreadcrumb('New Package');
+    } else {
+      $breadcrumbs = $this->createBreadcrumbs($user, $current);
+      $breadcrumbs->addBreadcrumb('Edit Package');
+    } 
     
     $success = false;
     if (isset($_POST['__submit__'])) {  
@@ -69,13 +74,11 @@ final class PackagesEditController extends ProtobuildController {
               ->setName($value_name)
               ->setGitURL($value_git)
               ->setDescription($value_desc)
-              ->setGoogleID($this->getSession()->getUserID())
+              ->setGoogleID($user->getGoogleID())
               ->create();
-              
-            // TODO: Redirect to package's page instead of manage list
-            header('Location: /packages/manage');
+            
+            header('Location: '.$package->getURI($user));
             die();
-              
           } else {
             $current
               ->setGitURL($value_git)

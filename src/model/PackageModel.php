@@ -59,11 +59,11 @@ final class PackageModel {
     return $this;
   }
   
-  public function getURI(GoogleToUserMappingModel $owner, $path = null) {
+  public function getURI(UserModel $owner, $path = null) {
     if ($path === null) {
-      return '/'.$owner->getUser().'/'.$this->getName();
+      return '/'.$owner->getCanonicalName().'/'.$this->getName();
     } else {
-      return '/'.$owner->getUser().'/'.$this->getName().'/'.$path;
+      return '/'.$owner->getCanonicalName().'/'.$this->getName().'/'.$path;
     }
   }
   
@@ -172,7 +172,7 @@ final class PackageModel {
     $dataset->commit($dataset_id, $req);
   }
   
-  public function loadAllForUser(GoogleToUserMappingModel $user) {
+  public function loadAllForUser(UserModel $user) {
     $id_value = new Google_Service_Datastore_Value();
     $id_value->setStringValue($user->getGoogleID());
     
@@ -212,7 +212,7 @@ final class PackageModel {
     return $results;
   }
   
-  public function loadByUserAndName(GoogleToUserMappingModel $user, $name) {
+  public function loadByUserAndName(UserModel $user, $name) {
     $name_value = new Google_Service_Datastore_Value();
     $name_value->setStringValue($name);
     

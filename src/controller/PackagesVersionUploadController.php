@@ -31,7 +31,7 @@ final class PackagesVersionUploadController extends ProtobuildController {
     
     if ($version->getHasFile()) {
       // This version already has a file.
-      header('Location: /'.$user->getUser().'/'.$package->getName());
+      header('Location: '.$package->getURI($user));
       die();
     }
     
@@ -65,7 +65,7 @@ final class PackagesVersionUploadController extends ProtobuildController {
           ->setLabel('Package File')
           ->setName('uploadFile')
           ->setTargetURI($resume_uri)
-          ->setRedirectURI('/'.$user->getUser().'/'.$package->getName())
+          ->setRedirectURI($package->getURI($user))
           ->setCaption('Must be a .tar.gz file with the appropriate project structure ')));
     
     return $this->buildApplicationPage(array(

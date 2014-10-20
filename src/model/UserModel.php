@@ -1,10 +1,12 @@
 <?php
 
-final class GoogleToUserMappingModel {
+final class UserModel {
   
   private $key;
   private $googleID;
-  private $user;
+  private $uniqueName;
+  private $canonicalName;
+  private $isOrganisation;
   
   const KIND = 'user';
   
@@ -30,21 +32,75 @@ final class GoogleToUserMappingModel {
     return $this;
   }
   
-  public function getUser() {
-    return $this->user;
+  public function getCanonicalName() {
+    return $this->canonicalName;
   }
   
-  public function setUser($user) {
-    $this->user = $user;
+  public function getUniqueName() {
+    return $this->uniqueName;
+  }
+  
+  public function setName($name) {
+    $this->uniqueName = strtolower($name);
+    $this->canonicalName = $name;
     return $this;
+  }
+  
+  public function getIsOrganisation() {
+    return $this->isOrganisation;
+  }
+  
+  public function setIsOrganisation($is_organisation) {
+    $this->isOrganisation = $is_organisation;
+    return $this;
+  }
+  
+  public function getTerm() {
+    if ($this->getIsOrganisation()) {
+      return 'organisation';
+    } else {
+      return 'user';
+    }
   }
   
   public function getURI($path = null) {
     if ($path === null) {
-      return '/'.$this->getUser();
+      return '/'.$this->getCanonicalName();
     } else {
-      return '/'.$this->getUser().'/'.$path;
+      return '/'.$this->getCanonicalName().'/'.$path;
     } 
+  }
+  
+  private static function unmapProperties($entity, $model) {
+    $props = $entity->getProperties();
+    
+    $props_googleID = idx($props, 'googleID');
+    $props_user = idx($props, 'canonicalName');
+    $props_isOrganisation = idx($props, 'isOrganisation');
+    
+    $value_googleID = null;
+    $value_user = null;
+    $value_isOrganisation = null;
+    
+    if ($props_googleID !== null) {
+      $value_googleID = $props_googleID->getStringValue();
+    }
+    
+    if ($props_user !== null) {
+      $value_user = $props_user->getStringValue();
+    }
+    
+    if ($props_isOrganisation !== null) {
+      $value_isOrganisation = $props_isOrganisation->getBooleanValue();
+    }
+    
+    $model
+      ->setKey(head($entity->getKey()->getPath())->getId())
+      ->setGoogleID($value_googleID)
+      ->setName($value_user)
+      ->setIsOrganisation($value_isOrganisation);
+      
+    return $model;
   }
   
   public function create() {
@@ -55,19 +111,28 @@ final class GoogleToUserMappingModel {
     $key = new Google_Service_Datastore_Key();
     $key->setPath(array($path));
     
-    $user_prop = new Google_Service_Datastore_Property();
-    $user_prop->setStringValue($this->getUser());
-    $user_prop->setIndexed(true);
+    $unique_name_prop = new Google_Service_Datastore_Property();
+    $unique_name_prop->setStringValue($this->getUniqueName());
+    $unique_name_prop->setIndexed(true);
+    
+    $canonical_name_prop = new Google_Service_Datastore_Property();
+    $canonical_name_prop->setStringValue($this->getCanonicalName());
     
     $google_id_prop = new Google_Service_Datastore_Property();
     $google_id_prop->setStringValue($this->getGoogleID());
     $google_id_prop->setIndexed(true);
     
+    $is_organisation_prop = new Google_Service_Datastore_Property();
+    $is_organisation_prop->setBooleanValue($this->getIsOrganisation());
+    $is_organisation_prop->setIndexed(true);
+    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
     $entity->setProperties(array(
-      'user' => $user_prop,
+      'uniqueName' => $unique_name_prop,
+      'canonicalName' => $canonical_name_prop,
       'googleID' => $google_id_prop,
+      'isOrganisation' => $is_organisation_prop,
     ));
 
     $mutation = new Google_Service_Datastore_Mutation();
@@ -80,6 +145,8 @@ final class GoogleToUserMappingModel {
     $dataset_id = "protobuild-index";
     
     $dataset->commit($dataset_id, $req);
+    
+    return $this;
   }
   
   public function update() {
@@ -90,19 +157,28 @@ final class GoogleToUserMappingModel {
     $key = new Google_Service_Datastore_Key();
     $key->setPath(array($path));
     
-    $user_prop = new Google_Service_Datastore_Property();
-    $user_prop->setStringValue($this->getUser());
-    $user_prop->setIndexed(true);
+    $unique_name_prop = new Google_Service_Datastore_Property();
+    $unique_name_prop->setStringValue($this->getUniqueName());
+    $unique_name_prop->setIndexed(true);
+    
+    $canonical_name_prop = new Google_Service_Datastore_Property();
+    $canonical_name_prop->setStringValue($this->getCanonicalName());
     
     $google_id_prop = new Google_Service_Datastore_Property();
     $google_id_prop->setStringValue($this->getGoogleID());
     $google_id_prop->setIndexed(true);
     
+    $is_organisation_prop = new Google_Service_Datastore_Property();
+    $is_organisation_prop->setBooleanValue($this->getIsOrganisation());
+    $is_organisation_prop->setIndexed(true);
+    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
     $entity->setProperties(array(
-      'user' => $user_prop,
+      'uniqueName' => $unique_name_prop,
+      'canonicalName' => $canonical_name_prop,
       'googleID' => $google_id_prop,
+      'isOrganisation' => $is_organisation_prop,
     ));
 
     $mutation = new Google_Service_Datastore_Mutation();
@@ -146,25 +222,22 @@ final class GoogleToUserMappingModel {
     
     $entity = head($entities);
     $entity = $entity->getEntity();
-    $props = $entity->getProperties();
     
-    $this->setKey(head($entity->getKey()->getPath())->getId());
-    $this->setUser(idx($props, 'user')->getStringValue());
-    $this->setGoogleID(idx($props, 'googleID')->getStringValue());
+    self::unmapProperties($entity, $this);
     
     return $this;
   }
   
   public function loadByName($username) {
     $name_value = new Google_Service_Datastore_Value();
-    $name_value->setStringValue($username);
+    $name_value->setStringValue(strtolower($username));
     
     $name_arg = new Google_Service_Datastore_GqlQueryArg();
     $name_arg->setName('name');
     $name_arg->setValue($name_value);
     
     $gql_query = new Google_Service_Datastore_GqlQuery();
-    $gql_query->setQueryString('SELECT * FROM user WHERE user = @name');
+    $gql_query->setQueryString('SELECT * FROM user WHERE uniqueName = @name');
     $gql_query->setNameArgs(array($name_arg));
     
     $query = new Google_Service_Datastore_RunQueryRequest();
@@ -186,9 +259,7 @@ final class GoogleToUserMappingModel {
     $entity = $entity->getEntity();
     $props = $entity->getProperties();
     
-    $this->setKey(head($entity->getKey()->getPath())->getId());
-    $this->setUser(idx($props, 'user')->getStringValue());
-    $this->setGoogleID(idx($props, 'googleID')->getStringValue());
+    self::unmapProperties($entity, $this);
     
     return $this;
   }

@@ -12,13 +12,14 @@ final class RouteDelegation {
       '/oauth2callback' => 'OAuth2CallbackController',
       '/login' => 'LoginController',
       '/logout' => 'LogoutController',
-      '/account/name' => 'AccountNameController',
       
-      // Package create
-      '/packages/new' => 'PackagesEditController',
+      // Organisation create
+      '/organisation/new' => 'OrganisationNewController',
       
       // Viewing users and packages
       '/(?P<owner>[^/]+)(/?)' => 'AccountViewController',
+      '/(?P<owner>[^/]+)/rename(/?)' => 'AccountRenameController',
+      '/(?P<owner>[^/]+)/new(/?)' => 'PackagesEditController',
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)(/?)' => 'PackagesViewController',
       
       // Package admin

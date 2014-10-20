@@ -74,7 +74,7 @@ final class BranchEditController extends ProtobuildController {
                 ->update();
             }
             
-            header('Location: /'.$user->getUser().'/'.$package->getName().'?branch=true');
+            header('Location: /'.$user->getCanonicalName().'/'.$package->getName().'?branch=true');
             die();
           } else {
             $error_name = 
