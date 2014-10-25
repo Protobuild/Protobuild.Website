@@ -2,10 +2,6 @@
 
 final class OwnershipRemoveController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   public function processRequest(array $data) {
     $user = $this->loadOwnerFromRequestAndRequireEdit($data);
     

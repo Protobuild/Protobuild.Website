@@ -2,10 +2,6 @@
 
 final class PackagesEditController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   public function processRequest(array $data) {
     $current_name = idx($data, 'package');
     $is_new = $current_name === null;

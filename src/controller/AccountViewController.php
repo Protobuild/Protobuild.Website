@@ -2,10 +2,6 @@
 
 final class AccountViewController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   protected function allowPublicAccess() {
     return true;
   }

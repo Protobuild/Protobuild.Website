@@ -2,10 +2,6 @@
 
 final class OrganisationNewController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   public function processRequest(array $data) {
     $error_name = null;
     $value_name = null;

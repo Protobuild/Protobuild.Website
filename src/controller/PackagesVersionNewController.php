@@ -2,10 +2,6 @@
 
 final class PackagesVersionNewController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   public function processApi(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     

@@ -2,10 +2,6 @@
 
 final class AccountRenameController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   protected function requiresAccountName() {
     return false;
   }

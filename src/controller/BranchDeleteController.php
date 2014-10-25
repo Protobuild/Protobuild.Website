@@ -2,10 +2,6 @@
 
 final class BranchDeleteController extends ProtobuildController {
   
-  protected function showInDevelopmentWarning() {
-    return true;
-  }
-  
   public function processRequest(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     
