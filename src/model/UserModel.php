@@ -264,4 +264,55 @@ final class UserModel {
     return $this;
   }
   
+  public function loadAllForIDs($google_ids) {
+
+    $query_components = array();
+    $args = array();
+    $ref_id = 0;
+    foreach ($google_ids as $id) {
+      $id_value = new Google_Service_Datastore_Value();
+      $id_value->setStringValue($id);
+      
+      $id_arg = new Google_Service_Datastore_GqlQueryArg();
+      $id_arg->setName('id'.$ref_id);
+      $id_arg->setValue($id_value);
+
+      $args[] = $id_arg;
+      $query_components[] = 'googleID = @id'.$ref_id;
+    }
+    
+    if (count($query_components) === 0) {
+      return array();
+    }
+    
+    $query = implode(' OR ', $query_components);
+    
+    $gql_query = new Google_Service_Datastore_GqlQuery();
+    $gql_query->setQueryString('SELECT * FROM user WHERE '.$query);
+    $gql_query->setNameArgs($args);
+    
+    $query = new Google_Service_Datastore_RunQueryRequest();
+    $query->setGqlQuery($gql_query);
+    
+    $dataset = $this->datastore->datasets;
+    $dataset_id = "protobuild-index";
+    
+    $result = $dataset->runQuery($dataset_id, $query);
+    
+    $batch = $result->getBatch();
+    $entities = $batch->getEntityResults();
+    
+    $results = array();
+    
+    foreach ($entities as $entity_result) {
+      $entity = $entity_result->getEntity();
+      $props = $entity->getProperties();
+      
+      $results[] = 
+        self::unmapProperties($entity, new UserModel());
+    }
+    
+    return $results;
+  }
+  
 }

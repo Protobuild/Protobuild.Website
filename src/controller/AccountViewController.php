@@ -71,14 +71,14 @@ final class AccountViewController extends ProtobuildController {
     if ($user->getIsOrganisation()) {
       $owners_list = array();
       
-      $owners = id(new OwnershipModel())
+      $owner_ids = id(new OwnershipModel())
         ->loadOwnersForOrganisationGoogleID($user->getGoogleID());
-      $owners = mpull($owners, 'getOwnerGoogleID');
+      $owner_ids = mpull($owner_ids, 'getOwnerGoogleID');
+      
+      $owners = id(new UserModel())
+        ->loadAllForIDs($owner_ids);
       
       foreach ($owners as $owner) {
-        // TODO Remove N+1
-        $owner = id(new UserModel())
-          ->load($owner);
         $owners_list[] = phutil_tag(
           'li',
           array(),
