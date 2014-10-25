@@ -29,14 +29,17 @@ final class PackagesVersionDeleteController extends ProtobuildController {
       
       if ($version->getHasFile()) {
         // Delete the file from Google Cloud Storage first.
-        $storage = id(new GoogleService())->getGoogleCloudStorage();
+        $storage_delete = id(new StorageDelete());
         
         $filename = $version->getKey().'.tar.gz';
-    
-        $object = new Google_Service_Storage_StorageObject();
-        $object->setName($filename);
-      
-        $storage->objects->delete('protobuild-packages', $object); 
+        
+        try {
+          $storage_delete->deleteFile($filename); 
+        } catch (Exception $ex) {
+          throw new ProtobuildException(
+            'Error while deleting '.$filename.' from Google Storage: '.
+            $ex->getMessage());
+        }
       
         $version
           ->setHasFile(false)

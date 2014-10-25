@@ -30,7 +30,7 @@ final class ResumableUpload extends Phobject {
     $client = id(new GoogleService())->getGoogleServiceClient();
     
     $httpRequest = new Google_Http_Request(
-        'https://www.googleapis.com/upload/storage/v1/b/protobuild-index/o?uploadType=resumable',
+        'https://www.googleapis.com/upload/storage/v1/b/protobuild-packages/o?uploadType=resumable',
         'POST',
         null,
         null

@@ -61,6 +61,7 @@ phutil_register_library_map(array(
     'ProtobuildRedirectException' => 'infrastructure/ProtobuildRedirectException.php',
     'ResumableUpload' => 'google/ResumableUpload.php',
     'RouteDelegation' => 'infrastructure/RouteDelegation.php',
+    'StorageDelete' => 'google/StorageDelete.php',
     'UserModel' => 'model/UserModel.php',
     'VersionModel' => 'model/VersionModel.php',
   ),
@@ -113,5 +114,6 @@ phutil_register_library_map(array(
     'ProtobuildException' => 'Exception',
     'ProtobuildRedirectException' => 'Exception',
     'ResumableUpload' => 'Phobject',
+    'StorageDelete' => 'Phobject',
   ),
 ));
