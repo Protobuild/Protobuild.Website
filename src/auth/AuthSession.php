@@ -5,7 +5,7 @@ final class AuthSession {
   private $client;
   
   public function start() {
-    session_start();
+    @session_start();
     
     $this->client = id(new GoogleService())->getGoogleWebClient();
     
@@ -50,8 +50,7 @@ final class AuthSession {
     $this->client->setScopes(array('profile'));
     
     $auth = $this->client->createAuthUrl();
-    header('Location: '.$auth);
-    die();
+    throw new ProtobuildRedirectException($auth);
   }
   
 }

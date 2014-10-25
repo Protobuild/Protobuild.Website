@@ -14,9 +14,7 @@ final class AccountRenameController extends ProtobuildController {
     $owner_name = idx($data, 'owner');
     
     if ($owner_name === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::USER_NOT_FOUND);
     }
     
     $user = id(new UserModel())
@@ -27,9 +25,7 @@ final class AccountRenameController extends ProtobuildController {
         // It is the current user attempting to set their name
         // for the first time.
       } else {
-        // TODO Show 404 user not found
-        header('Location: /index');
-        die();
+        throw new Protobuild404Exception(CommonErrors::USER_NOT_FOUND);
       }
     }
     
@@ -49,8 +45,7 @@ final class AccountRenameController extends ProtobuildController {
               ->create();
               
             // On first set, redirect to manage packages.
-            header('Location: '.$user->getURI());
-            die();
+            throw new ProtobuildRedirectException($user->getURI());
           } else {
             $did_rename = false;
             if ($_POST['username'] !== $user->getCanonicalName()) {
@@ -61,8 +56,8 @@ final class AccountRenameController extends ProtobuildController {
             $user->update();
             
             if ($did_rename) {
-              header('Location: '.$user->getURI('rename?success=true'));
-              die();
+              throw new ProtobuildRedirectException(
+                $user->getURI('rename?success=true'));
             }
           }
           

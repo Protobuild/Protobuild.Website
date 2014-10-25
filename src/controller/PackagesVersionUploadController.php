@@ -14,25 +14,16 @@ final class PackagesVersionUploadController extends ProtobuildController {
       ->loadByKey($current_id);
     
     if ($version === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::VERSION_NOT_FOUND);
     }
     
     if ($user->getGoogleID() !== $version->getGoogleID() ||
       $package->getName() !== $version->getPackageName()) {
-      
-      // TODO Show 404 user not found
-      // This happens if you use an upload ID for a different
-      // user than the one you're looking at
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::ACCESS_DENIED);
     }
     
     if ($version->getHasFile()) {
-      // This version already has a file.
-      header('Location: '.$package->getURI($user));
-      die();
+      throw new ProtobuildException(CommonErrors::VERSION_ALREADY_HAS_FILE);
     }
     
     $filename = $version->getKey().'.tar.gz';

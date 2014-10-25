@@ -55,9 +55,7 @@ abstract class ProtobuildController extends Phobject {
     UserModel $user) {
     
     if (!$this->canEdit($user)) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::ACCESS_DENIED);
     }
     
     return $user;
@@ -67,18 +65,14 @@ abstract class ProtobuildController extends Phobject {
     $owner_name = idx($data, 'owner');
     
     if ($owner_name === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::USER_NOT_FOUND);
     }
     
     $owner = id(new UserModel())
       ->loadByName($owner_name);
     
     if ($owner === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::USER_NOT_FOUND);
     }
     
     return $owner;
@@ -90,18 +84,14 @@ abstract class ProtobuildController extends Phobject {
     $package_name = idx($data, 'package');
     
     if ($package_name === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::PACKAGE_NOT_FOUND);
     }
     
     $package = id(new PackageModel())
       ->loadByUserAndName($owner, $package_name);
     
     if ($package === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::PACKAGE_NOT_FOUND);
     }
     
     return array($owner, $package);

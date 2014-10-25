@@ -15,18 +15,14 @@ final class AccountViewController extends ProtobuildController {
     $username = idx($data, 'owner');
     
     if ($username === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::USER_NOT_FOUND);
     }
     
     $user = id(new UserModel())
       ->loadByName($username);
     
     if ($user === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::USER_NOT_FOUND);
     }
     
     $breadcrumbs = $this->createBreadcrumbs($user);

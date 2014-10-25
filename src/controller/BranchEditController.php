@@ -26,7 +26,7 @@ final class BranchEditController extends ProtobuildController {
       $branch = idx($branch, $branch_name);
       
       if ($branch === null) {
-        $error_name = 'Branch was not found';
+        throw new Protobuild404Exception(CommonErrors::BRANCH_NOT_FOUND);
       } else {
         $value_name = $branch->getBranchName();
         $value_git = $branch->getVersionName();
@@ -40,9 +40,7 @@ final class BranchEditController extends ProtobuildController {
     $versions = mpull($versions, 'getVersionName', 'getVersionName');
     
     if (count($versions) === 0) {
-      // TODO show appropriate error
-      header('Location: '.$package->getURI($user));
-      die();
+      throw new ProtobuildException(CommonErrors::PACKAGE_HAS_NO_VERSIONS);
     }
     
     if (isset($_POST['name'])) {  
@@ -74,8 +72,7 @@ final class BranchEditController extends ProtobuildController {
                 ->update();
             }
             
-            header('Location: /'.$user->getCanonicalName().'/'.$package->getName().'?branch=true');
-            die();
+            throw new ProtobuildRedirectException($package->getURI($user).'?branch=true');
           } else {
             $error_name = 
               'Branch names can only contain letters, numbers and dashes';

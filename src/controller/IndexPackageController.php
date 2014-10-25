@@ -13,8 +13,7 @@ final class IndexPackageController extends ProtobuildController {
     $version_name = idx($data, 'version');
     
     if ($platform_name === null || $version_name === null) {
-      // TODO 404
-      die();
+      throw new Protobuild404Exception(CommonErrors::MISSING_INFORMATION);
     }
       
     // Attempt to resolve version_name as a branch.
@@ -29,13 +28,7 @@ final class IndexPackageController extends ProtobuildController {
       $version_name);
     
     if ($version === null) {
-      // TODO 404
-      header('Content-Type: text/plain');
-      echo $user->getCanonicalName()."\r\n".
-        $package->getName()."\r\n".
-        $platform_name."\r\n".
-        $version_name."\r\n";
-      return '';
+      throw new Protobuild404Exception(CommonErrors::VERSION_NOT_FOUND);
     }
     
     $id = $version->getKey();
@@ -50,8 +43,7 @@ final class IndexPackageController extends ProtobuildController {
     $result = $storage->objects->get('protobuild-packages', $object);
     
     $download_url = 'https://storage.googleapis.com/protobuild-packages/'.$filename;
-    header('Location: '.$download_url);
-    die();
+    throw new ProtobuildRedirectException($download_url);
   }
   
 }

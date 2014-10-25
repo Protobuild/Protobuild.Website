@@ -35,7 +35,7 @@ final class PackagesEditController extends ProtobuildController {
         ->loadByUserAndName($user, $current_name);
       
       if ($current === null) {
-        $error_name = 'Package was not found';
+        throw new Protobuild404Exception(CommonErrors::PACKAGE_NOT_FOUND);
       } else {
         $value_name = $current->getName();
         $value_git = $current->getGitURL();
@@ -77,8 +77,7 @@ final class PackagesEditController extends ProtobuildController {
               ->setGoogleID($user->getGoogleID())
               ->create();
             
-            header('Location: '.$package->getURI($user));
-            die();
+            throw new ProtobuildRedirectException($package->getURI($user));
           } else {
             $current
               ->setGitURL($value_git)

@@ -52,8 +52,8 @@ final class PackagesVersionNewController extends ProtobuildController {
           ->setVersionName($value_version)
           ->create();
         
-        header('Location: '.$package->getURI($user, 'version/upload/'.$version->getKey()));
-        die();
+        throw new ProtobuildRedirectException(
+          $package->getURI($user, 'version/upload/'.$version->getKey()));
       }
     }
     

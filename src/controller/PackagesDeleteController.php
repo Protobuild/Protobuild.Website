@@ -13,9 +13,7 @@ final class PackagesDeleteController extends ProtobuildController {
     $branches = id(new BranchModel())->loadAllForPackage($user, $package);
     
     if (count($versions) !== 0 || count($branches) !== 0) {
-      // TODO show appropriate error
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::PACKAGE_STILL_HAS_BRANCHES_OR_VERSIONS);
     }
     
     $breadcrumbs = $this->createBreadcrumbs($user, $package);
@@ -24,8 +22,7 @@ final class PackagesDeleteController extends ProtobuildController {
     if (isset($_POST['__submit__'])) {
       $package->delete();
       
-      header('Location: '.$user->getURI());
-      die();
+      throw new ProtobuildRedirectException($user->getURI());
     }
     
     $form = id(new Panel())

@@ -14,19 +14,12 @@ final class PackagesVersionDeleteController extends ProtobuildController {
       ->loadByKey($current_id);
     
     if ($version === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::VERSION_NOT_FOUND);
     }
     
     if ($user->getGoogleID() !== $version->getGoogleID() ||
       $package->getName() !== $version->getPackageName()) {
-      
-      // TODO Show 404 user not found
-      // This happens if you use an upload ID for a different
-      // user than the one you're looking at
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::ACCESS_DENIED);
     }
     
     $breadcrumbs = $this->createBreadcrumbs($user, $package);
@@ -52,8 +45,7 @@ final class PackagesVersionDeleteController extends ProtobuildController {
       
       $version->delete();
       
-      header('Location: '.$package->getURI($user));
-      die();
+      throw new ProtobuildRedirectException($package->getURI($user));
     }
     
     $form = id(new Panel())

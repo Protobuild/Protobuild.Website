@@ -9,10 +9,8 @@ final class OwnershipAddController extends ProtobuildController {
   public function processRequest(array $data) {
     $user = $this->loadOwnerFromRequestAndRequireEdit($data);
     
-    if (!$user->getIsOrganisation()) {    
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+    if (!$user->getIsOrganisation()) {
+      throw new ProtobuildException(CommonErrors::USER_IS_NOT_ORGANISATION);
     }
     
     $breadcrumbs = $this->createBreadcrumbs($user);
@@ -44,8 +42,7 @@ final class OwnershipAddController extends ProtobuildController {
             ->setOrganisationGoogleID($user->getGoogleID())
             ->create();
           
-          header('Location: '.$user->getURI());
-          die();
+          throw new ProtobuildRedirectException($user->getURI());
         }
       }
     }

@@ -16,9 +16,7 @@ final class BranchDeleteController extends ProtobuildController {
     $branch = idx($branch, $branch_name);
     
     if ($branch === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new Protobuild404Exception(CommonErrors::BRANCH_NOT_FOUND);
     }
     
     $breadcrumbs = $this->createBreadcrumbs($user, $package);
@@ -26,8 +24,7 @@ final class BranchDeleteController extends ProtobuildController {
     
     if (isset($_POST['__submit__'])) {
       $branch->delete();
-      header('Location: '.$package->getURI($user));
-      die();
+      throw new ProtobuildRedirectException($package->getURI($user));
     }
     
     $versions = id(new VersionModel())->loadAllForPackage($user, $package);

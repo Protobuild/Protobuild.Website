@@ -42,10 +42,28 @@ try {
   list($controller_class, $request) = 
     $delegation->getControllerAndDataForUri($_REQUEST['__path__']);
   
+  if ($controller_class === null) {
+    throw new Protobuild404Exception(CommonErrors::PAGE_NOT_FOUND);
+  }
+  
   $controller = new $controller_class();
   $controller->beginRequest($request);
   echo $controller->processRequest($request);
-
+} catch (Protobuild404Exception $ex) {
+  $controller = new ProtobuildErrorController();
+  $controller->setException($ex);
+  $controller->setCode(404);
+  $controller->beginRequest(array());
+  echo $controller->processRequest(array());
+} catch (ProtobuildException $ex) {
+  $controller = new ProtobuildErrorController();
+  $controller->setException($ex);
+  $controller->setCode(500);
+  $controller->beginRequest(array());
+  echo $controller->processRequest(array());
+} catch (ProtobuildRedirectException $ex) {
+  header('Location: '.$ex->getURI());
+  die();
 } catch (Exception $ex) {
   ProtobuildStartup::didEncounterFatalException(
     'Core Exception',

@@ -10,32 +10,24 @@ final class OwnershipRemoveController extends ProtobuildController {
     $user = $this->loadOwnerFromRequestAndRequireEdit($data);
     
     if (!$user->getIsOrganisation()) {    
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::USER_IS_NOT_ORGANISATION);
     }
     
     $to_remove_name = idx($data, 'remove');
     
     if ($to_remove_name === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::USER_NOT_FOUND);
     }
     
     $to_remove = id(new UserModel())
       ->loadByName($to_remove_name);
     
     if ($to_remove === null) {
-      // TODO Show 404 user not found
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::USER_NOT_FOUND);
     }
     
     if (!$user->canRemoveOwner($to_remove, $this->getUser())) {
-      // TODO Show 404 user unable to be removed
-      header('Location: /index');
-      die();
+      throw new ProtobuildException(CommonErrors::ACCESS_DENIED);
     }
     
     $breadcrumbs = $this->createBreadcrumbs($user);
@@ -50,8 +42,7 @@ final class OwnershipRemoveController extends ProtobuildController {
       foreach ($ownerships as $ownership) {
         if ($ownership->getOwnerGoogleID() === $to_remove->getGoogleID()) {
           $ownership->delete();
-          header('Location: '.$user->getURI());
-          die();
+          throw new ProtobuildRedirectException($user->getURI());
         }
       }
     }

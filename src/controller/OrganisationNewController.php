@@ -36,8 +36,7 @@ final class OrganisationNewController extends ProtobuildController {
             ->create();
           
           // On first set, redirect to manage packages.
-          header('Location: '.$organisation->getURI());
-          die();
+          throw new ProtobuildRedirectException($organisation->getURI());
         } else {
           $error_name = 
             'Organisation names can only contain '.
