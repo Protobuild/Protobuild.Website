@@ -16,15 +16,17 @@ final class RouteDelegation {
       // Organisation create
       '/organisation/new' => 'OrganisationNewController',
       
-      // Viewing users and packages
+      // Viewing users
       '/(?P<owner>[^/]+)(/?)' => 'AccountViewController',
-      '/(?P<owner>[^/]+)/(?P<package>[^/]+)(/?)' => 'PackagesViewController',
       
       // Account admin
       '/(?P<owner>[^/]+)/rename(/?)' => 'AccountRenameController',
       '/(?P<owner>[^/]+)/owner/add(/?)' => 'OwnershipAddController',
       '/(?P<owner>[^/]+)/owner/remove/(?P<remove>[^/]+)(/?)' => 'OwnershipRemoveController',
       '/(?P<owner>[^/]+)/new(/?)' => 'PackagesEditController',
+      
+      // Viewing packages
+      '/(?P<owner>[^/]+)/(?P<package>[^/]+)(/?)' => 'PackagesViewController',
       
       // Package admin
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/edit(/?)' => 'PackagesEditController',
