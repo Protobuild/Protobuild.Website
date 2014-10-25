@@ -23,6 +23,7 @@ final class RouteDelegation {
       // Account admin
       '/(?P<owner>[^/]+)/rename(/?)' => 'AccountRenameController',
       '/(?P<owner>[^/]+)/owner/add(/?)' => 'OwnershipAddController',
+      '/(?P<owner>[^/]+)/owner/remove/(?P<remove>[^/]+)(/?)' => 'OwnershipRemoveController',
       '/(?P<owner>[^/]+)/new(/?)' => 'PackagesEditController',
       
       // Package admin

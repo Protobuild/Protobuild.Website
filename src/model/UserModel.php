@@ -71,6 +71,14 @@ final class UserModel {
     } 
   }
   
+  public function canRemoveOwner($owner, $current_user){
+    if (!$this->getIsOrganisation()) {
+      return false;
+    }
+    
+    return $owner->getGoogleID() !== $current_user->getGoogleID();
+  }
+  
   private static function unmapProperties($entity, $model) {
     $props = $entity->getProperties();
     

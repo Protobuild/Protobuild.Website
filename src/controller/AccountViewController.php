@@ -79,13 +79,27 @@ final class AccountViewController extends ProtobuildController {
         ->loadAllForIDs($owner_ids);
       
       foreach ($owners as $owner) {
+        $remove_option = null;
+        
+        if ($user->canRemoveOwner($owner, $this->getUser())) {
+          $remove_option = array(
+            ' (',
+            phutil_tag(
+              'a',
+              array('href' => $user->getURI('owner/remove/'.$owner->getCanonicalName())),
+              'Remove'),
+            ')');
+        }
+        
         $owners_list[] = phutil_tag(
           'li',
           array(),
-          phutil_tag(
-            'a',
-            array('href' => $owner->getURI()),
-            $owner->getCanonicalName()));
+          array(
+            phutil_tag(
+              'a',
+              array('href' => $owner->getURI()),
+              $owner->getCanonicalName()),
+            $remove_option));
       }
       
       $owners_list = array(
@@ -126,16 +140,6 @@ final class AccountViewController extends ProtobuildController {
             'href' => $user->getURI('owner/add'),
           ),
           'Add Owner'
-        );
-        
-        $buttons[] = phutil_tag(
-          'a',
-          array(
-            'type' => 'button',
-            'class' => 'btn btn-default',
-            'disabled' => 'disabled',
-          ),
-          'Edit Owners'
         );
       } else {
         // Only show New Organisation when we're look at our own account.
