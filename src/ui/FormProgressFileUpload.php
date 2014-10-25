@@ -23,6 +23,16 @@ final class FormProgressFileUpload extends FormControl {
       phutil_tag(
         'div',
         array(
+          'class' => 'alert alert-danger',
+          'style' => 'display: none',
+          'id' => $this->getName().'-error-box',
+          'name' => $this->getName().'-error-box',
+        ),
+        ''
+      ),
+      phutil_tag(
+        'div',
+        array(
           'class' => 'dynamic-file-upload',
           'id' => $this->getName(),
           'name' => $this->getName(),

@@ -259,6 +259,7 @@ abstract class ProtobuildController extends Phobject {
     <script src="/rsrc/js/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/rsrc/js/bootstrap.min.js"></script>
+    <script src="/rsrc/js/gzip.js"></script>
     <script src="/rsrc/js/upload.js"></script>
   </body>
 </html>
