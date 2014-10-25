@@ -10,6 +10,23 @@ final class PackagesViewController extends ProtobuildController {
     return true;
   }
   
+  public function processApi(array $data) {
+    list($user, $package) = $this->loadOwnerAndPackageFromRequest($data);
+    
+    $versions = id(new VersionModel())->loadAllForPackage($user, $package);
+    $branches = id(new BranchModel())->loadAllForPackage($user, $package);
+    
+    $versions = mpull($versions, 'getJSONArray');
+    $branches = mpull($branches, 'getJSONArray');
+    
+    return array(
+      'user' => $user->getJSONArray(),
+      'package' => $package->getJSONArray($user),
+      'versions' => $versions,
+      'branches' => $branches,
+    );
+  }
+  
   public function processRequest(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequest($data);
     $can_edit = $this->canEdit($user);

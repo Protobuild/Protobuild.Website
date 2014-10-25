@@ -78,6 +78,22 @@ final class PackageModel {
     return $html;
   }
   
+  public function getJSONArray(UserModel $owner) {
+    $git_url = $this->getGitURL();
+    if ($git_url == '') {
+      $git_url = null;
+    }
+    
+    return array(
+      'ownerID' => $this->getGoogleID(),
+      'name' => $this->getName(),
+      'moduleUrl' => ProtobuildEnv::get('domain').$this->getURI($owner),
+      'apiUrl' => ProtobuildEnv::get('domain').'/api'.$this->getURI($owner),
+      'gitUrl' => $git_url,
+      'description' => $this->getDescription(),
+    );
+  }
+  
   private function mapProperties() {
     $mappings = array(
       'name' => $this->getName(),

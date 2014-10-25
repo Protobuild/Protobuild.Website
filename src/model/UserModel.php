@@ -79,6 +79,18 @@ final class UserModel {
     return $owner->getGoogleID() !== $current_user->getGoogleID();
   }
   
+  public function getJSONArray() {
+    return array(
+      'id' => $this->getGoogleID(),
+      'canonicalName' => $this->getCanonicalName(),
+      'uniqueName' => $this->getUniqueName(),
+      'isOrganisation' => $this->getIsOrganisation(),
+      'term' => $this->getTerm(),
+      'url' => ProtobuildEnv::get('domain').$this->getURI(),
+      'apiUrl' => ProtobuildEnv::get('domain').'/api'.$this->getURI(),
+    );
+  }
+  
   private static function unmapProperties($entity, $model) {
     $props = $entity->getProperties();
     

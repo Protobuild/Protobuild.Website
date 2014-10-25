@@ -69,6 +69,18 @@ final class VersionModel {
     return $this;
   }
   
+  public function getJSONArray() {
+    return array(
+      'ownerID' => $this->getGoogleID(),
+      'packageName' => $this->getPackageName(),
+      'versionName' => $this->getVersionName(),
+      'platformName' => $this->getPlatformName(),
+      'hasFile' => $this->getHasFile(),
+      'downloadUrl' => 
+        'https://storage.googleapis.com/protobuild-packages/'.$this->getKey().'.tar.gz',
+    );
+  }
+  
   private function mapProperties() {
     $mappings = array(
       'googleID' => $this->getGoogleID(),

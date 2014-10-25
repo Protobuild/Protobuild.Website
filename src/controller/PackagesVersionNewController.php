@@ -6,6 +6,61 @@ final class PackagesVersionNewController extends ProtobuildController {
     return true;
   }
   
+  public function processApi(array $data) {
+    list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
+    
+    if (isset($_POST['version']) && isset($_POST['platform'])) {
+      $value_version = $_POST['version'];
+      $value_platform = $_POST['platform'];
+      
+      if (strlen($value_version) === 0) {
+        throw new ProtobuildException('No Git hash (version name) specified');
+      }
+      
+      if (preg_match('/^[0-9a-f]{40}$/', $value_version) !== 1) {
+        throw new ProtobuildException(
+          'Git hash (version name) is not an SHA1 hash');
+      }
+      
+      // TODO Validate platform
+      
+      $existing = id(new VersionModel())
+        ->loadByPackagePlatformAndVersion(
+          $user,
+          $package,
+          $value_platform,
+          $value_version);
+      if ($existing !== null) {
+        if ($existing->getHasFile()) {
+          throw new ProtobuildException(
+            'Another version already exists with this Git hash and platform');
+        } else {
+          // Allow this API endpoint to be used to upload missing files as well.
+          $version = $existing;
+        }
+      } else {
+        $version = id(new VersionModel())
+          ->setGoogleID($this->getSession()->getUserID())
+          ->setPackageName($package->getName())
+          ->setPlatformName($value_platform)
+          ->setVersionName($value_version)
+          ->create();
+      }
+    
+      $filename = $version->getKey().'.tar.gz';
+      $resume_uri = id(new ResumableUpload())->getResumableURI($filename);
+      
+      $end_uri = $package->getURI($user, 'version/upload/'.$version->getKey());
+      
+      return array(
+        'uploadUrl' => $resume_uri,
+        'finalizeUrl' => ProtobuildEnv::get('domain').'/api'.$end_uri,
+      );
+    }
+    
+    throw new ProtobuildException(CommonErrors::MISSING_INFORMATION);
+  }
+  
   public function processRequest(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
 

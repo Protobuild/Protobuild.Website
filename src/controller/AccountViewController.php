@@ -10,8 +10,22 @@ final class AccountViewController extends ProtobuildController {
     return true;
   }
   
-  public function processRequest(array $data) {
+  public function processApi(array $data) {
+    $user = $this->loadOwnerFromRequest($data);
     
+    $packages = id(new PackageModel())->loadAllForUser($user);
+    $json_packages = array();
+    foreach ($packages as $package) {
+      $json_packages[] = $package->getJSONArray($user);
+    }
+    
+    return array(
+      'user' => $user->getJSONArray(),
+      'packages' => $json_packages,
+    );
+  }
+  
+  public function processRequest(array $data) {
     $username = idx($data, 'owner');
     
     if ($username === null) {

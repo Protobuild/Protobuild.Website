@@ -35,32 +35,40 @@ require_once $protobuild_root.'/externals/Google/Signer/P12.php';
 ProtobuildStartup::didStartup();
 
 $show_unexpected_traces = false;
+$is_api = false;
 try {
   ProtobuildStartup::loadCoreLibraries();
-
+  
+  $path = $_REQUEST['__path__'];
+  if (substr($path, 0, 5) === '/api/') {
+    $path = '/'.substr($path, 5);
+    $is_api = true;
+  }
+  
   $delegation = new RouteDelegation();
   list($controller_class, $request) = 
-    $delegation->getControllerAndDataForUri($_REQUEST['__path__']);
+    $delegation->getControllerAndDataForUri($path);
   
   if ($controller_class === null) {
     throw new Protobuild404Exception(CommonErrors::PAGE_NOT_FOUND);
   }
   
   $controller = new $controller_class();
-  $controller->beginRequest($request);
-  echo $controller->processRequest($request);
+  $controller->beginRequest($request, $is_api);
+  
+  echo $controller->processRequestOrApi($request, $is_api);
 } catch (Protobuild404Exception $ex) {
   $controller = new ProtobuildErrorController();
   $controller->setException($ex);
   $controller->setCode(404);
-  $controller->beginRequest(array());
-  echo $controller->processRequest(array());
+  $controller->beginRequest(array(), $is_api);
+  echo $controller->processRequestOrApi(array(), $is_api);
 } catch (ProtobuildException $ex) {
   $controller = new ProtobuildErrorController();
   $controller->setException($ex);
   $controller->setCode(500);
-  $controller->beginRequest(array());
-  echo $controller->processRequest(array());
+  $controller->beginRequest(array(), $is_api);
+  echo $controller->processRequestOrApi(array(), $is_api);
 } catch (ProtobuildRedirectException $ex) {
   header('Location: '.$ex->getURI());
   die();

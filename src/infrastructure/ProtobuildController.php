@@ -5,13 +5,17 @@ abstract class ProtobuildController extends Phobject {
   private $session;
   private $user;
   
-  public function beginRequest(array $data) {
+  public function beginRequest(array $data, $is_api) {
     $this->session = new AuthSession();
-    $this->session->start();
+    $this->session->start($is_api);
     
     if (!$this->allowPublicAccess() && !$this->session->isAuthenticated()) {
-      $this->session->authenticate();
-      return;
+      if ($is_api) {
+        throw new ProtobuildException('You are not authenticated.');
+      } else {
+        $this->session->authenticate();
+        return;
+      }
     }
 
     if ($this->session->isAuthenticated()) {
@@ -20,8 +24,13 @@ abstract class ProtobuildController extends Phobject {
       
       if ($this->requiresAccountName()) {
         if ($this->user === null || $this->user->getCanonicalName() === null) {
-          header('Location: /'.$this->getSession()->getUserID().'/rename');
-          die();
+          if ($is_api) {
+            throw new ProtobuildException(
+              'You must set your account name before using the API.');
+          } else {
+            header('Location: /'.$this->getSession()->getUserID().'/rename');
+            die();
+          }
         }
       }
     }
@@ -134,6 +143,31 @@ abstract class ProtobuildController extends Phobject {
   }
   
   abstract function processRequest(array $data);
+  
+  protected function processApi(array $data) {
+    throw new ProtobuildException(CommonErrors::NOT_AN_API);
+  }
+  
+  public function processRequestOrApi(array $data, $is_api) {
+    if ($is_api) {
+      header('Content-Type: application/json');
+      
+      $result = $this->processApi($data);
+      if (get_class($this) === 'ProtobuildErrorController') {
+        return json_encode($result, JSON_PRETTY_PRINT);
+      } else {
+        return json_encode(
+          array(
+            'has_error' => false,
+            'error' => null,
+            'result' => $result
+          ),
+          JSON_PRETTY_PRINT);
+      }
+    } else {
+      return $this->processRequest($data);
+    }
+  }
   
   protected function getNavigationName() {
     return null;

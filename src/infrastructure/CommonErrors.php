@@ -16,6 +16,9 @@ final class CommonErrors extends Phobject {
   const PACKAGE_HAS_NO_VERSIONS = 'Package has no available versions.';
   const PACKAGE_STILL_HAS_BRANCHES_OR_VERSIONS = 'Package still has branches or versions.';
   
+  const VERSION_ALREADY_HAS_FILE = 'This version already has a file uploaded.';
+  
   const MISSING_INFORMATION = 'The request is missing information.';
   
+  const NOT_AN_API = 'This route does not support being called through the API.';
 }

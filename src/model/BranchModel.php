@@ -59,6 +59,15 @@ final class BranchModel {
     return $this;
   }
   
+  public function getJSONArray() {
+    return array(
+      'ownerID' => $this->getGoogleID(),
+      'packageName' => $this->getPackageName(),
+      'branchName' => $this->getBranchName(),
+      'versionName' => $this->getVersionName(),
+    );
+  }
+  
   private function mapProperties() {
     $mappings = array(
       'googleID' => $this->getGoogleID(),

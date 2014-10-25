@@ -23,6 +23,9 @@ final class ProtobuildErrorController extends ProtobuildController {
       $title = '&times;';
     }
     
+    // Requires PHP 5.4.0 or higher.
+    http_response_code($this->code);
+    
     return $this->buildApplicationPage(hsprintf(<<<EOF
 <div class="fourohfour">
 $title
@@ -32,6 +35,14 @@ $title
 </div>
 EOF
     , $this->exception->getProtobuildMessage()));
+  }
+  
+  public function processApi(array $data) {
+    return array(
+      'has_error' => true,
+      'error' => $this->exception->getProtobuildMessage(),
+      'result' => null,
+    );
   }
   
 }
