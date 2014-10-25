@@ -177,6 +177,7 @@ final class BranchModel {
     $dataset_id = "protobuild-index";
     
     $dataset->commit($dataset_id, $req);
+    return $this;
   }
   
   public function delete() {

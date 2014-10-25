@@ -153,7 +153,6 @@ final class UserModel {
     $dataset_id = "protobuild-index";
     
     $dataset->commit($dataset_id, $req);
-    
     return $this;
   }
   
@@ -199,6 +198,7 @@ final class UserModel {
     $dataset_id = "protobuild-index";
     
     $dataset->commit($dataset_id, $req);
+    return $this;
   }
   
   public function load($google_id) {
