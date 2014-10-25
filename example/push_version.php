@@ -124,7 +124,7 @@ list($status, $body, $headers) = id(new HTTPSFuture($uri.'/version/new'))
     'platform' => $package_platform,
     ))
   ->resolve();
-  
+
 $json = phutil_json_decode($body);
 
 if ($json['has_error']) {

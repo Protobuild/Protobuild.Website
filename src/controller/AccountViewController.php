@@ -118,6 +118,20 @@ final class AccountViewController extends ProtobuildController {
         phutil_tag('ul', array(), $owners_list));
     }
     
+    $api_key = null;
+    if (!$user->getIsOrganisation() && $this->canEdit($user)) {
+      $api_key = array(
+        phutil_tag('h3', array(), 'API Key'),
+        phutil_tag('p', array(), array(
+          'Your API key is: ',
+          phutil_tag(
+            'strong',
+            array(),
+            $user->getOrGenerateAndSaveApiKey()->openEnvelope()),
+          '.  Guard this key as it can be used to read / write packages '.
+          'on your account.')));
+    }
+    
     $buttons = array();
     
     if ($this->canEdit($user)) {
@@ -180,6 +194,7 @@ final class AccountViewController extends ProtobuildController {
     return $this->buildApplicationPage(array(
       $breadcrumbs,
       $content,
+      $api_key,
       $owners_list,
       $buttons,
     ));

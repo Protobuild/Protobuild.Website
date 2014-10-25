@@ -10,11 +10,21 @@ final class AuthSession {
   
   public function start($is_api) {
     if ($is_api) {
-      
       $api_key = idx($_POST, '__apikey__');
+      if ($api_key !== null) {
+        $user = id(new UserModel())->loadByApiKey(
+          new PhutilOpaqueEnvelope($api_key));
       
-      // TODO: Implement API keys
-      
+        if ($user !== null) {
+          $this->id = $user->getGoogleID();
+          $this->token = null;
+          $this->realName = null;
+          $this->authenticated = true;
+        }
+        
+        // We intentionally don't throw exceptions here because this logic
+        // is executed inside the Protobuild exception handlers.
+      }
     } else {
       @session_start();
       

@@ -7,6 +7,7 @@ final class UserModel {
   private $uniqueName;
   private $canonicalName;
   private $isOrganisation;
+  private $apiKey;
   
   const KIND = 'user';
   
@@ -55,6 +56,15 @@ final class UserModel {
     return $this;
   }
   
+  public function getApiKey() {
+    return $this->apiKey;
+  }
+  
+  public function setApiKey(PhutilOpaqueEnvelope $key = null) {
+    $this->apiKey = $key;
+    return $this;
+  }
+  
   public function getTerm() {
     if ($this->getIsOrganisation()) {
       return 'organisation';
@@ -91,16 +101,48 @@ final class UserModel {
     );
   }
   
+  protected function getAndOpenApiKey() {
+    $api_key = $this->getApiKey();
+    
+    if ($api_key === null) {
+      return null;
+    }
+    
+    return $api_key->openEnvelope();
+  }
+  
+  public function getOrGenerateAndSaveApiKey() {
+    $api_key = $this->getApiKey();
+    
+    while ($api_key === null) {
+      $proposed_key = new PhutilOpaqueEnvelope(
+        Filesystem::readRandomCharacters(32));
+      
+      $existing_user = id(new UserModel())->loadByApiKey($proposed_key);
+      if ($existing_user === null) {
+        $api_key = $proposed_key;
+      }
+    }
+    
+    if ($this->getApiKey() === null) {
+      $this->setApiKey($api_key)->update();
+    }
+    
+    return $api_key;
+  }
+  
   private static function unmapProperties($entity, $model) {
     $props = $entity->getProperties();
     
     $props_googleID = idx($props, 'googleID');
     $props_user = idx($props, 'canonicalName');
     $props_isOrganisation = idx($props, 'isOrganisation');
+    $props_apiKey = idx($props, 'apiKey');
     
     $value_googleID = null;
     $value_user = null;
     $value_isOrganisation = null;
+    $value_apiKey = null;
     
     if ($props_googleID !== null) {
       $value_googleID = $props_googleID->getStringValue();
@@ -114,11 +156,16 @@ final class UserModel {
       $value_isOrganisation = $props_isOrganisation->getBooleanValue();
     }
     
+    if ($props_apiKey !== null) {
+      $value_apiKey = new PhutilOpaqueEnvelope($props_apiKey->getStringValue());
+    }
+    
     $model
       ->setKey(head($entity->getKey()->getPath())->getId())
       ->setGoogleID($value_googleID)
       ->setName($value_user)
-      ->setIsOrganisation($value_isOrganisation);
+      ->setIsOrganisation($value_isOrganisation)
+      ->setApiKey($value_apiKey);
       
     return $model;
   }
@@ -146,6 +193,10 @@ final class UserModel {
     $is_organisation_prop->setBooleanValue($this->getIsOrganisation());
     $is_organisation_prop->setIndexed(true);
     
+    $api_key_prop = new Google_Service_Datastore_Property();
+    $api_key_prop->setStringValue($this->getAndOpenApiKey());
+    $api_key_prop->setIndexed(true);
+    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
     $entity->setProperties(array(
@@ -153,6 +204,7 @@ final class UserModel {
       'canonicalName' => $canonical_name_prop,
       'googleID' => $google_id_prop,
       'isOrganisation' => $is_organisation_prop,
+      'apiKey' => $api_key_prop,
     ));
 
     $mutation = new Google_Service_Datastore_Mutation();
@@ -191,6 +243,10 @@ final class UserModel {
     $is_organisation_prop->setBooleanValue($this->getIsOrganisation());
     $is_organisation_prop->setIndexed(true);
     
+    $api_key_prop = new Google_Service_Datastore_Property();
+    $api_key_prop->setStringValue($this->getAndOpenApiKey());
+    $api_key_prop->setIndexed(true);
+    
     $entity = new Google_Service_Datastore_Entity();
     $entity->setKey($key);
     $entity->setProperties(array(
@@ -198,6 +254,7 @@ final class UserModel {
       'canonicalName' => $canonical_name_prop,
       'googleID' => $google_id_prop,
       'isOrganisation' => $is_organisation_prop,
+      'apiKey' => $api_key_prop,
     ));
 
     $mutation = new Google_Service_Datastore_Mutation();
@@ -259,6 +316,42 @@ final class UserModel {
     $gql_query = new Google_Service_Datastore_GqlQuery();
     $gql_query->setQueryString('SELECT * FROM user WHERE uniqueName = @name');
     $gql_query->setNameArgs(array($name_arg));
+    
+    $query = new Google_Service_Datastore_RunQueryRequest();
+    $query->setGqlQuery($gql_query);
+    
+    $dataset = $this->datastore->datasets;
+    $dataset_id = "protobuild-index";
+    
+    $result = $dataset->runQuery($dataset_id, $query);
+    
+    $batch = $result->getBatch();
+    $entities = $batch->getEntityResults();
+    
+    if (count($entities) === 0) {
+      return null;
+    }
+    
+    $entity = head($entities);
+    $entity = $entity->getEntity();
+    $props = $entity->getProperties();
+    
+    self::unmapProperties($entity, $this);
+    
+    return $this;
+  }
+  
+  public function loadByApiKey(PhutilOpaqueEnvelope $api_key) {
+    $api_key_value = new Google_Service_Datastore_Value();
+    $api_key_value->setStringValue($api_key->openEnvelope());
+    
+    $api_key_arg = new Google_Service_Datastore_GqlQueryArg();
+    $api_key_arg->setName('key');
+    $api_key_arg->setValue($api_key_value);
+    
+    $gql_query = new Google_Service_Datastore_GqlQuery();
+    $gql_query->setQueryString('SELECT * FROM user WHERE apiKey = @key');
+    $gql_query->setNameArgs(array($api_key_arg));
     
     $query = new Google_Service_Datastore_RunQueryRequest();
     $query->setGqlQuery($gql_query);
