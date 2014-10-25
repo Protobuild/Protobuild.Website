@@ -170,9 +170,19 @@ abstract class ProtobuildController extends Phobject {
     
     $navigation_tags = array();
     foreach ($navigation as $name => $info) {
-      $active = array();
       if ($name === $this->getNavigationName()) {
         $active = array('class' => 'active');
+      } elseif ($name !== 'home' && $name !== 'index') {
+        $active = array('class' => 'hidden-xs');
+      } else {
+        $active = array();
+      }
+      
+      $title = $info['title'];
+      if ($name === 'index') {
+        $title = array(
+          phutil_tag('span', array('class' => 'hidden-xs'), 'Package Index'),
+          phutil_tag('span', array('class' => 'hidden-sm hidden-md hidden-lg'), 'Index'));
       }
       
       $navigation_tags[] = phutil_tag(
@@ -181,7 +191,7 @@ abstract class ProtobuildController extends Phobject {
         phutil_tag(
           'a',
           array('href' => $info['uri']),
-          $info['title']));
+          $title));
     }
     
     $auth = null;
