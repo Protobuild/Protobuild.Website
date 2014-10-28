@@ -19,7 +19,7 @@ final class IndexIndexController extends ProtobuildController {
       $versions_items = array();
       
       foreach ($versions_grouped as $version_name => $version_platforms) {
-        echo $version_name."\r\n";
+        echo $version_name." ".$version_name."\r\n";
       }
     }
     
@@ -27,7 +27,7 @@ final class IndexIndexController extends ProtobuildController {
     
     if (count($branches) !== 0) {
       foreach ($branches as $branch) {
-        echo $branch->getBranchName()."\r\n";
+        echo $branch->getBranchName()." ".$branch->getVersionName()."\r\n";
       }
     }
     
