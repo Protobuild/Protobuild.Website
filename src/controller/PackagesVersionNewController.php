@@ -36,7 +36,7 @@ final class PackagesVersionNewController extends ProtobuildController {
         }
       } else {
         $version = id(new VersionModel())
-          ->setGoogleID($this->getSession()->getUserID())
+          ->setGoogleID($user->getGoogleID())
           ->setPackageName($package->getName())
           ->setPlatformName($value_platform)
           ->setVersionName($value_version)
@@ -97,7 +97,7 @@ final class PackagesVersionNewController extends ProtobuildController {
       
       if ($error_file === null && $error_platform === null && $error_version === null) {
         $version = id(new VersionModel())
-          ->setGoogleID($this->getSession()->getUserID())
+          ->setGoogleID($user->getGoogleID())
           ->setPackageName($package->getName())
           ->setPlatformName($value_platform)
           ->setVersionName($value_version)
