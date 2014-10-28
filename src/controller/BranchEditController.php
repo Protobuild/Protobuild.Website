@@ -45,7 +45,7 @@ final class BranchEditController extends ProtobuildController {
             
             if ($branch === null) {
               $new_branch = id(new BranchModel())
-                ->setGoogleID($this->getSession()->getUserID())
+                ->setGoogleID($user->getGoogleID())
                 ->setPackageName($package->getName())
                 ->setBranchName($value_name)
                 ->setVersionName($value_git)
@@ -124,7 +124,7 @@ final class BranchEditController extends ProtobuildController {
             
             if ($branch === null) {
               $new_branch = id(new BranchModel())
-                ->setGoogleID($this->getSession()->getUserID())
+                ->setGoogleID($user->getGoogleID())
                 ->setPackageName($package->getName())
                 ->setBranchName($value_name)
                 ->setVersionName($value_git)
