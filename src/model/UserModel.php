@@ -82,6 +82,10 @@ final class UserModel {
   }
   
   public function canRemoveOwner($owner, $current_user){
+    if ($current_user === null) {
+      return false;
+    }
+    
     if (!$this->getIsOrganisation()) {
       return false;
     }
