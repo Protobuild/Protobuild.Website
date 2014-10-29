@@ -220,18 +220,28 @@ abstract class ProtobuildController extends Phobject {
     
     $auth = null;
     if ($this->session->isAuthenticated()) {
-      $auth = array(
+      $auth = array();
+      $auth[] = array(
         'Logged in as '.$this->session->getRealName(),
         phutil_safe_html(' &bull; '),
-        phutil_tag(
-          'a',
-          array('href' => $this->getUser()->getURI()),
-          'My Account'),
-        phutil_safe_html(' &bull; '),
+      );
+      
+      if ($this->getUser() !== null) {
+        $auth[] = array(
+          phutil_tag(
+            'a',
+            array('href' => $this->getUser()->getURI()),
+            'My Account'),
+          phutil_safe_html(' &bull; '),
+        );
+      }
+      
+      $auth[] = array(
         phutil_tag(
           'a',
           array('href' => '/logout'),
-          'Logout'));
+          'Logout'),
+      );
     } else {
       $auth = array(
         phutil_tag(
