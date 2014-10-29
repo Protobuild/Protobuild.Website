@@ -50,7 +50,7 @@ final class PackagesVersionNewController extends ProtobuildController {
       
       return array(
         'uploadUrl' => $resume_uri,
-        'finalizeUrl' => ProtobuildEnv::get('domain').'/api'.$end_uri,
+        'finalizeUrl' => make_api_url(ProtobuildEnv::get('domain').$end_uri),
       );
     }
     

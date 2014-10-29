@@ -40,8 +40,8 @@ try {
   ProtobuildStartup::loadCoreLibraries();
   
   $path = $_REQUEST['__path__'];
-  if (substr($path, 0, 5) === '/api/') {
-    $path = '/'.substr($path, 5);
+  if (substr($path, -4) === '/api') {
+    $path = substr($path, 0, -4);
     $is_api = true;
   }
   

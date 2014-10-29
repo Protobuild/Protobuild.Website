@@ -41,11 +41,6 @@ final class RouteDelegation {
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/branch/new(/?)' => 'BranchEditController',
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/branch/edit/(?P<name>[^/]+)(/?)' => 'BranchEditController',
       '/(?P<owner>[^/]+)/(?P<package>[^/]+)/branch/delete/(?P<name>[^/]+)(/?)' => 'BranchDeleteController',
-      
-      // API for Protobuild itself
-      '/(?P<owner>[^/]+)/(?P<package>[^/]+)/index' => 'IndexIndexController',
-      '/(?P<owner>[^/]+)/(?P<package>[^/]+)/(?P<version>[^/]+)/platforms' => 'IndexPlatformsController',
-      '/(?P<owner>[^/]+)/(?P<package>[^/]+)/(?P<version>[^/]+)/(?P<platform>[^/]+)\.tar\.gz' => 'IndexPackageController',
     );
   }
   

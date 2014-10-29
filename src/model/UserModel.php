@@ -101,7 +101,7 @@ final class UserModel {
       'isOrganisation' => $this->getIsOrganisation(),
       'term' => $this->getTerm(),
       'url' => ProtobuildEnv::get('domain').$this->getURI(),
-      'apiUrl' => ProtobuildEnv::get('domain').'/api'.$this->getURI(),
+      'apiUrl' => make_api_url(ProtobuildEnv::get('domain').$this->getURI()),
     );
   }
   

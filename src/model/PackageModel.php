@@ -88,7 +88,7 @@ final class PackageModel {
       'ownerID' => $this->getGoogleID(),
       'name' => $this->getName(),
       'moduleUrl' => ProtobuildEnv::get('domain').$this->getURI($owner),
-      'apiUrl' => ProtobuildEnv::get('domain').'/api'.$this->getURI($owner),
+      'apiUrl' => make_api_url(ProtobuildEnv::get('domain').$this->getURI($owner)),
       'gitUrl' => $git_url,
       'description' => $this->getDescription(),
     );
