@@ -53,7 +53,7 @@ function initFileUpload(element_id, uri, returnURI) {
         }
         finalize.open('POST', window.location.href, true);
         finalize.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-        finalize.send('uploaded=true');
+        finalize.send('uploaded=true&archiveType=tar/gzip');
       }
     }
     

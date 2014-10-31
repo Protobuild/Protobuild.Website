@@ -21,8 +21,8 @@ final class PackagesVersionUploadController extends ProtobuildController {
     if ($version->getHasFile()) {
       throw new ProtobuildException(CommonErrors::VERSION_ALREADY_HAS_FILE);
     }
-  
-    $filename = $version->getKey().'.tar.gz';
+    
+    $filename = $version->getFilenameForStorage();
   
     $storage = id(new GoogleService())->getGoogleCloudStorage();
     
@@ -36,6 +36,7 @@ final class PackagesVersionUploadController extends ProtobuildController {
     // Mark as uploaded.
     $version
       ->setHasFile(true)
+      ->setArchiveType($_POST['archiveType'])
       ->update();
       
     return 'File marked as uploaded.';
@@ -61,9 +62,10 @@ final class PackagesVersionUploadController extends ProtobuildController {
       throw new ProtobuildException(CommonErrors::VERSION_ALREADY_HAS_FILE);
     }
     
-    $filename = $version->getKey().'.tar.gz';
+    $filename = $version->getFilenameForStorage();
     
-    if (isset($_POST['uploaded'])) {
+    if (isset($_POST['uploaded']) && isset($_POST['archiveType'])) {
+      
       $storage = id(new GoogleService())->getGoogleCloudStorage();
       
       // Allow public access.
@@ -76,6 +78,7 @@ final class PackagesVersionUploadController extends ProtobuildController {
       // Mark as uploaded.
       $version
         ->setHasFile(true)
+        ->setArchiveType($_POST['archiveType'])
         ->update();
       die('Marked file as present');
     }
@@ -92,11 +95,20 @@ final class PackagesVersionUploadController extends ProtobuildController {
           ->setName('uploadFile')
           ->setTargetURI($resume_uri)
           ->setRedirectURI($package->getURI($user))
-          ->setCaption('Must be a .tar.gz file with the appropriate project structure ')));
+          ->setCaption('Must be a .tar.gz file file with the appropriate project structure ')));
+    
+    $lzma_not_supported = 
+      phutil_tag(
+        'div', 
+        array('class' => 'alert alert-warning', 'role' => 'alert'),
+        'Due to browser limitations, you can not upload LZMA compressed '.
+        'TAR files (.tar.lzma) through the web interface.  Use '.
+        'Protobuild from the command line to push LZMA compressed packages.');
     
     return $this->buildApplicationPage(array(
       $breadcrumbs,
       $form,
+      $lzma_not_supported,
     ));
   }
   

@@ -7,6 +7,7 @@ final class VersionModel {
   private $packageName;
   private $platformName;
   private $versionName;
+  private $archiveType;
   private $hasFile = false;
   
   const KIND = 'version';
@@ -69,6 +70,24 @@ final class VersionModel {
     return $this;
   }
   
+  public function getArchiveType() {
+    return $this->archiveType;
+  }
+  
+  public function setArchiveType($archive_type) {
+    $this->archiveType = $archive_type;
+    return $this;
+  }
+  
+  public function getDownloadUrl() {
+    $prefix = 'https://storage.googleapis.com/protobuild-packages/';
+    return $prefix.$this->getFilenameForStorage();
+  }
+  
+  public function getFilenameForStorage() {
+    return $this->getKey().'.pkg';
+  }
+  
   public function getJSONArray() {
     return array(
       'ownerID' => $this->getGoogleID(),
@@ -76,8 +95,8 @@ final class VersionModel {
       'versionName' => $this->getVersionName(),
       'platformName' => $this->getPlatformName(),
       'hasFile' => $this->getHasFile(),
-      'downloadUrl' => 
-        'https://storage.googleapis.com/protobuild-packages/'.$this->getKey().'.tar.gz',
+      'archiveType' => $this->getArchiveType(),
+      'downloadUrl' => $this->getDownloadUrl(),
     );
   }
   
@@ -88,6 +107,7 @@ final class VersionModel {
       'platformName' => $this->getPlatformName(),
       'versionName' => $this->getVersionName(),
       'hasFile' => $this->getHasFile(),
+      'archiveType' => $this->getArchiveType(),
     );
     
     $indexes = array(
@@ -122,12 +142,14 @@ final class VersionModel {
     $props_platformName = idx($props, 'platformName');
     $props_versionName = idx($props, 'versionName');
     $props_hasFile = idx($props, 'hasFile');
+    $props_archiveType = idx($props, 'archiveType');
     
     $value_googleID = null;
     $value_packageName = null;
     $value_platformName = null;
     $value_versionName = null;
     $value_hasFile = false;
+    $value_archiveType = null;
     
     if ($props_googleID !== null) {
       $value_googleID = $props_googleID->getStringValue();
@@ -149,12 +171,17 @@ final class VersionModel {
       $value_hasFile = $props_hasFile->getBooleanValue();
     }
     
+    if ($props_archiveType !== null) {
+      $value_archiveType = $props_archiveType->getStringValue();
+    }
+    
     $model
       ->setKey(head($entity->getKey()->getPath())->getId())
       ->setGoogleID($value_googleID)
       ->setPackageName($value_packageName)
       ->setPlatformName($value_platformName)
       ->setVersionName($value_versionName)
+      ->setArchiveType($value_archiveType)
       ->setHasFile($value_hasFile);
       
     return $model;

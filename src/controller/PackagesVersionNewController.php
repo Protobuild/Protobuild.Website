@@ -43,7 +43,7 @@ final class PackagesVersionNewController extends ProtobuildController {
           ->create();
       }
     
-      $filename = $version->getKey().'.tar.gz';
+      $filename = $version->getFilenameForStorage();
       $resume_uri = id(new ResumableUpload())->getResumableURI($filename);
       
       $end_uri = $package->getURI($user, 'version/upload/'.$version->getKey());
