@@ -151,3 +151,7 @@ div.progress {
     text-align: center;
   }
 }
+
+div.panel-body > p:last-child {
+  margin-bottom: 0px;
+}
