@@ -34,11 +34,11 @@ final class PackagesViewController extends ProtobuildController {
     
     $is_windows = strpos($_SERVER['HTTP_USER_AGENT'], 'Windows') !== false;
     
-    $add_module = <<<EOF
+    $kickstart = <<<EOF
 <div class="panel panel-default">
   <div class="panel-body">
     <form role="form" method="POST">
-      <p>Add this package to your project by running:</p>
+      <p>%s</p>
       <div class="form-group" style="margin-bottom: 0px;">
         <input type="text" class="form-control" disabled="disabled" value="%s">
       </div>
@@ -51,11 +51,25 @@ EOF;
     if (!$is_windows) {
       $prefix = 'mono ';
     }
+    
+    $instruction = '';
+    $mode = '';
+    switch ($package->getType()) {
+      case PackageModel::TYPE_LIBRARY:
+        $instruction = 'Add this package to your project by running:';
+        $mode = 'add';
+        break;
+      case PackageModel::TYPE_TEMPLATE:
+        $instruction = 'Start with this project template by running:';
+        $mode = 'start';
+        break;
+    }
 
     $allow_delete = false;
-    $add_module = hsprintf(
-      $add_module,
-      $prefix.'Protobuild.exe --add http://protobuild.org'.$package->getURI($user));
+    $kickstart = hsprintf(
+      $kickstart,
+      $instruction,
+      $prefix.'Protobuild.exe --'.$mode.' http://protobuild.org'.$package->getURI($user));
     
     $desc = phutil_tag('p', array(), $package->getFormattedDescription());
     
@@ -75,7 +89,7 @@ EOF
     $branches = mpull($branches, null, 'getBranchName');
     
     if (count($versions) === 0 && strlen($package->getGitURL()) === 0) {
-      $add_module = id(new Panel())
+      $kickstart = id(new Panel())
         ->setType('danger')
         ->setHeading('No source URL or binaries present')
         ->appendChild(
@@ -304,7 +318,7 @@ EOF
     
     return $this->buildApplicationPage(array(
       $breadcrumbs,
-      $add_module,
+      $kickstart,
       $message,
       $header,
       $desc,

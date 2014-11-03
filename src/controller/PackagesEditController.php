@@ -12,10 +12,12 @@ final class PackagesEditController extends ProtobuildController {
       list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     }
     
+    $error_type = null;
     $error_name = null;
     $error_git = null;
     $error_desc = null;
     
+    $value_type = null;
     $value_name = null;
     $value_git = null;
     $value_desc = null;
@@ -23,6 +25,11 @@ final class PackagesEditController extends ProtobuildController {
     $caption_name = '';
     if (!$is_new) {
       $caption_name = 'Packages can not be renamed after they are created.';
+    }
+    
+    $caption_type = '';
+    if (!$is_new) {
+      $caption_type = 'Packages can not change type after they are created.';
     }
     
     $current = null;
@@ -34,6 +41,7 @@ final class PackagesEditController extends ProtobuildController {
         throw new Protobuild404Exception(CommonErrors::PACKAGE_NOT_FOUND);
       } else {
         $value_name = $current->getName();
+        $value_type = $current->getType();
         $value_git = $current->getGitURL();
         $value_desc = $current->getDescription();
       }
@@ -52,8 +60,10 @@ final class PackagesEditController extends ProtobuildController {
       
       if ($is_new) {
         $value_name = $_POST['name'];
+        $value_type = $_POST['type'];
       } else {
         $value_name = $current->getName();
+        $value_type = $current->getType();
       } 
       
       $value_git = $_POST['git'];
@@ -68,6 +78,7 @@ final class PackagesEditController extends ProtobuildController {
           if ($current === null) {
             $package = id(new PackageModel())
               ->setName($value_name)
+              ->setType($value_type)
               ->setGitURL($value_git)
               ->setDescription($value_desc)
               ->setGoogleID($user->getGoogleID())
@@ -116,6 +127,17 @@ final class PackagesEditController extends ProtobuildController {
           ->setPlaceholder('Enter package name (letters, numbers, dashes and dots only)')
           ->setDisabled(!$is_new)
           ->setCaption($caption_name))
+        ->appendChild(id(new FormSelectInput())
+          ->setName('type')
+          ->setLabel('Package Type')
+          ->setValue($value_type)
+          ->setError($error_type)
+          ->setDisabled(!$is_new)
+          ->setCaption($caption_type)
+          ->setOptions(array(
+            PackageModel::TYPE_LIBRARY => 'Library',
+            PackageModel::TYPE_TEMPLATE => 'Template',
+          )))
         ->appendChild(id(new FormTextInput())
           ->setName('git')
           ->setLabel('Git Source URL')

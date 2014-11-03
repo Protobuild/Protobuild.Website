@@ -7,8 +7,12 @@ final class PackageModel {
   private $name;
   private $gitURL;
   private $description;
+  private $type;
   
   const KIND = 'package';
+  
+  const TYPE_LIBRARY = 'library';
+  const TYPE_TEMPLATE = 'template';
   
   public function __construct() {
     $this->datastore = id(new GoogleService())->getGoogleCloudDatastore();
@@ -59,6 +63,15 @@ final class PackageModel {
     return $this;
   }
   
+  public function getType() {
+    return $this->type;
+  }
+  
+  public function setType($type) {
+    $this->type = $type;
+    return $this;
+  }
+  
   public function getURI(UserModel $owner, $path = null) {
     if ($path === null) {
       return '/'.$owner->getCanonicalName().'/'.$this->getName();
@@ -87,6 +100,7 @@ final class PackageModel {
     return array(
       'ownerID' => $this->getGoogleID(),
       'name' => $this->getName(),
+      'type' => $this->getType(),
       'moduleUrl' => ProtobuildEnv::get('domain').$this->getURI($owner),
       'apiUrl' => make_api_url(ProtobuildEnv::get('domain').$this->getURI($owner)),
       'gitUrl' => $git_url,
@@ -100,11 +114,13 @@ final class PackageModel {
       'googleID' => $this->getGoogleID(),
       'gitURL' => $this->getGitURL(),
       'description' => $this->getDescription(),
+      'type' => $this->getType(),
     );
     
     $indexes = array(
       'name' => true,
-      'googleID' => true
+      'googleID' => true,
+      'type' => true,
     );
     
     $results = array();
@@ -118,6 +134,52 @@ final class PackageModel {
     }
     
     return $results;
+  }
+  
+  private static function unmapProperties($entity, $model) {
+    $props = $entity->getProperties();
+    
+    $props_name = idx($props, 'name');
+    $props_type = idx($props, 'type');
+    $props_googleID = idx($props, 'googleID');
+    $props_gitURL = idx($props, 'gitURL');
+    $props_description = idx($props, 'description');
+    
+    $value_name = null;
+    $value_type = null;
+    $value_googleID = null;
+    $value_gitURL = null;
+    $value_description = null;
+    
+    if ($props_name !== null) {
+      $value_name = $props_name->getStringValue();
+    }
+    
+    if ($props_type !== null) {
+      $value_type = $props_type->getStringValue();
+    }
+    
+    if ($props_googleID !== null) {
+      $value_googleID = $props_googleID->getStringValue();
+    }
+    
+    if ($props_gitURL !== null) {
+      $value_gitURL = $props_gitURL->getStringValue();
+    }
+    
+    if ($props_description !== null) {
+      $value_description = $props_description->getStringValue();
+    }
+        
+    $model
+      ->setKey(head($entity->getKey()->getPath())->getId())
+      ->setName($value_name)
+      ->setType($value_type)
+      ->setGoogleID($value_googleID)
+      ->setGitURL($value_gitURL)
+      ->setDescription($value_description);
+    
+    return $model;
   }
   
   public function create() {
@@ -219,12 +281,8 @@ final class PackageModel {
       $entity = $entity_result->getEntity();
       $props = $entity->getProperties();
       
-      $results[] = id(new PackageModel())
-        ->setKey(head($entity->getKey()->getPath())->getId())
-        ->setName(idx($props, 'name')->getStringValue())
-        ->setGoogleID(idx($props, 'googleID')->getStringValue())
-        ->setGitURL(idx($props, 'gitURL')->getStringValue())
-        ->setDescription(idx($props, 'description')->getStringValue());
+      $results[] = 
+        self::unmapProperties($entity, new PackageModel());
     }
     
     return $results;
@@ -267,14 +325,8 @@ final class PackageModel {
     
     $entity = head($entities);
     $entity = $entity->getEntity();
-    $props = $entity->getProperties();
     
-    $this
-      ->setKey(head($entity->getKey()->getPath())->getId())
-      ->setName(idx($props, 'name')->getStringValue())
-      ->setGoogleID(idx($props, 'googleID')->getStringValue())
-      ->setGitURL(idx($props, 'gitURL')->getStringValue())
-      ->setDescription(idx($props, 'description')->getStringValue());
+    self::unmapProperties($entity, $this);
     
     return $this;
   }

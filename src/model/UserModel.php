@@ -338,7 +338,6 @@ final class UserModel {
     
     $entity = head($entities);
     $entity = $entity->getEntity();
-    $props = $entity->getProperties();
     
     self::unmapProperties($entity, $this);
     
@@ -374,7 +373,6 @@ final class UserModel {
     
     $entity = head($entities);
     $entity = $entity->getEntity();
-    $props = $entity->getProperties();
     
     self::unmapProperties($entity, $this);
     
