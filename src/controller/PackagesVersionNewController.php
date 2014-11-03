@@ -108,6 +108,30 @@ final class PackagesVersionNewController extends ProtobuildController {
       }
     }
     
+    $options = array();
+    switch ($package->getType()) {
+      case PackageModel::TYPE_LIBRARY:
+        $options = array(
+          'Android' => 'Android',
+          'iOS' => 'iOS',
+          'Linux' => 'Linux',
+          'MacOS' => 'MacOS',
+          'Ouya' => 'Ouya',
+          'PCL' => 'PCL',
+          'PlayStation4' => 'PlayStation4',
+          'PSMobile' => 'PSMobile',
+          'Windows' => 'Windows',
+          'Windows8' => 'Windows8',
+          'WindowsPhone' => 'WindowsPhone',
+          'WindowsPhone81' => 'WindowsPhone81',
+          'Web' => 'Web',
+        );
+        break;
+      case PackageModel::TYPE_TEMPLATE:
+        $options = array('Template' => 'Template');
+        break;
+    }
+    
     $form = id(new Panel())
       ->appendChild(id(new Form())
         ->appendChild(id(new FormTextInput())
@@ -121,21 +145,7 @@ final class PackagesVersionNewController extends ProtobuildController {
           ->setLabel('Platform')
           ->setValue($value_platform)
           ->setError($error_platform)
-          ->setOptions(array(
-            'Android' => 'Android',
-            'iOS' => 'iOS',
-            'Linux' => 'Linux',
-            'MacOS' => 'MacOS',
-            'Ouya' => 'Ouya',
-            'PCL' => 'PCL',
-            'PlayStation4' => 'PlayStation4',
-            'PSMobile' => 'PSMobile',
-            'Windows' => 'Windows',
-            'Windows8' => 'Windows8',
-            'WindowsPhone' => 'WindowsPhone',
-            'WindowsPhone81' => 'WindowsPhone81',
-            'Web' => 'Web',
-          )))
+          ->setOptions($options))
         ->appendChild(phutil_tag(
           'p',
           array(),

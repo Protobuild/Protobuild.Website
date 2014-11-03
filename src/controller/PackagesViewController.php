@@ -54,6 +54,7 @@ EOF;
     
     $instruction = '';
     $mode = '';
+    $suffix = '';
     switch ($package->getType()) {
       case PackageModel::TYPE_LIBRARY:
         $instruction = 'Add this package to your project by running:';
@@ -62,6 +63,7 @@ EOF;
       case PackageModel::TYPE_TEMPLATE:
         $instruction = 'Start with this project template by running:';
         $mode = 'start';
+        $suffix = ' MyProject';
         break;
     }
 
@@ -69,7 +71,7 @@ EOF;
     $kickstart = hsprintf(
       $kickstart,
       $instruction,
-      $prefix.'Protobuild.exe --'.$mode.' http://protobuild.org'.$package->getURI($user));
+      $prefix.'Protobuild.exe --'.$mode.' http://protobuild.org'.$package->getURI($user).$suffix);
     
     $desc = phutil_tag('p', array(), $package->getFormattedDescription());
     
