@@ -63,8 +63,16 @@ final class BranchEditController extends ProtobuildController {
               'Branch names can only contain letters, numbers and dashes');
           } 
         } else {
-          throw new ProtobuildException(
-            'You already have a branch with the same name');
+          // If two requests update the branch at the same time, we can
+          // race and hit here (because it fails to load $branch, but then
+          // succeeds in loading $existing).  In that case, just update
+          // the loaded branch instead of erroring.
+          $existing
+            ->setBranchName($value_name)
+            ->setVersionName($value_git)
+            ->update();
+            
+          return array('Branch updated successfully.');
         }
       }
     }
