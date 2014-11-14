@@ -10,6 +10,7 @@ final class IndexController extends ProtobuildController {
     return $this->buildApplicationPage(
       array(
         new IndexBannerControl(),
+        new IndexSearchControl(),
         new IndexFeaturesControl(),
       ));
   }

@@ -131,6 +131,24 @@ div.progress {
     margin-bottom: 30px;
     text-align: center;
   }
+  
+  ol.breadcrumb {
+    width: 70%;
+  }
+  
+  #breadcrumb-search {
+    float: right; 
+    width: 28%;
+  }
+  
+  #breadcrumb-search input {
+    height: 36px; 
+    line-height: 18px;
+  }
+  
+  #breadcrumb-search button {
+    height: 36px;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -149,6 +167,10 @@ div.progress {
     margin: auto;
     margin-bottom: 30px;
     text-align: center;
+  }
+  
+  #breadcrumb-search-form {
+    display: none;
   }
 }
 

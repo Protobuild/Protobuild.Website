@@ -305,6 +305,8 @@ abstract class ProtobuildController extends Phobject {
     <script src="/rsrc/js/bootstrap.min.js"></script>
     <script src="/rsrc/js/gzip.js"></script>
     <script src="/rsrc/js/upload.js"></script>
+    <script type="text/javascript">window.SEARCH_URI="%s";</script>
+    <script src="/rsrc/js/search.js"></script>
   </body>
 </html>
 EOF
@@ -312,7 +314,8 @@ EOF
     $navigation_tags,
     $in_dev,
     $content,
-    $auth);
+    $auth,
+    ProtobuildEnv::get('search.endpoint'));
   }
   
 }

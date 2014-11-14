@@ -81,8 +81,12 @@ final class PackageModel {
   }
   
   public function getFormattedDescription() {
+    return self::getStaticFormattedDescription($this->description);
+  }
+  
+  public static function getStaticFormattedDescription($description) {
     $html = array();
-    $lines = phutil_split_lines($this->description);
+    $lines = phutil_split_lines($description);
     foreach ($lines as $line) {
       $html[] = phutil_tag('br', array(), null);
       $html[] = $line;

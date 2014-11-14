@@ -27,10 +27,26 @@ final class Breadcrumbs extends Control {
       }
     }
     
-    return phutil_tag(
-      'ol',
-      array('class' => 'breadcrumb'),
-      $items);
+    $search = hsprintf(<<<EOF
+<form action="/search" method="GET" id="breadcrumb-search-form">
+  <div id="breadcrumb-search" class="input-group">
+    <input type="text" id="search-packages" class="form-control" placeholder="Search" name="q">
+    <span class="input-group-btn">
+      <button class="btn btn-default" type="submit">
+        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+      </button>
+    </span>
+  </div>
+</form>
+EOF
+    );
+    
+    return array(
+      $search,
+        phutil_tag(
+        'ol',
+        array('class' => 'breadcrumb'),
+        $items));
   }
   
 }

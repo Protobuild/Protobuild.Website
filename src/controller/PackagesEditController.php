@@ -83,6 +83,8 @@ final class PackagesEditController extends ProtobuildController {
               ->setDescription($value_desc)
               ->setGoogleID($user->getGoogleID())
               ->create();
+              
+            id(new SearchConnector())->reindexPackage($package);
             
             throw new ProtobuildRedirectException($package->getURI($user));
           } else {
@@ -90,6 +92,8 @@ final class PackagesEditController extends ProtobuildController {
               ->setGitURL($value_git)
               ->setDescription($value_desc);
             $current->update();
+              
+            id(new SearchConnector())->reindexPackage($current);
           }
           
           $success = true;

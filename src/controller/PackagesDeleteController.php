@@ -15,8 +15,14 @@ final class PackagesDeleteController extends ProtobuildController {
     $breadcrumbs = $this->createBreadcrumbs($user, $package);
     $breadcrumbs->addBreadcrumb('Delete');
     
-    if (isset($_POST['__submit__'])) {
+    if (isset($_POST['__submit__'])) {     
+      $id = $package->getKey();
+            
       $package->delete();
+      
+      // The package must be removed from the data store before we are allowed
+      // to remove it from the full text index.
+      id(new SearchConnector())->removePackage($id);
       
       throw new ProtobuildRedirectException($user->getURI());
     }

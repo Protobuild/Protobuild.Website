@@ -4,7 +4,7 @@ final class IndexFeaturesControl extends Control {
   
   public function render() {
     return hsprintf(<<<EOF
-<div class="row marketing">
+<div class="row marketing" id="index-features">
   <h4><span class="glyphicon glyphicon-star"></span> Truely cross-platform</h4>
   <p>
     Packages that support every platform.  Rather than focusing on frameworks, 

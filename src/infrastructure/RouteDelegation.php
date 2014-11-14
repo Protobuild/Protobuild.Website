@@ -7,6 +7,7 @@ final class RouteDelegation {
       // Public pages
       '/' => 'HomeController',
       '/index' => 'IndexController',
+      '/search' => 'SearchController',
       
       // Login and account setup
       '/oauth2callback' => 'OAuth2CallbackController',
