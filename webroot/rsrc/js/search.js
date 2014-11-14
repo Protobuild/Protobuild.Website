@@ -25,7 +25,7 @@ function schedule_search_request() {
             query_copy,
             "Protobuild Index Search: " + query_copy, 
             "/search?q=" + encodeURI(query_copy));
-        } catch {
+        } catch(err) {
           // API might not be supported.
         }
         
