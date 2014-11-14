@@ -20,9 +20,19 @@ final class PackagesDeleteController extends ProtobuildController {
             
       $package->delete();
       
-      // The package must be removed from the data store before we are allowed
-      // to remove it from the full text index.
-      id(new SearchConnector())->removePackage($id);
+      for ($attempt = 0; $attempt < 10; $attempt++) {
+        try {
+          // The package must be removed from the data store before we are allowed
+          // to remove it from the full text index.
+          id(new SearchConnector())->removePackage($id);
+          break;
+        } catch (Exception $ex) {
+          sleep(1);
+          // Retry the removal request, because we can't recover from a failure
+          // otherwise (i.e. ignoring here will cause invalid data in the full
+          // text search).
+        }
+      }
       
       throw new ProtobuildRedirectException($user->getURI());
     }
