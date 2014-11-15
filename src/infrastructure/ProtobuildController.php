@@ -182,7 +182,7 @@ abstract class ProtobuildController extends Phobject {
       'home' => array('uri' => '/', 'title' => 'Home'),
       'index' => array('uri' => '/index', 'title' => 'Package Index'),
       'docs' => array(
-        'uri' => 'https://github.com/hach-que/Protobuild/wiki',
+        'uri' => 'https://protobuild.readthedocs.org/',
         'title' => 'Documentation'),
       'src' => array(
         'uri' => 'https://github.com/hach-que/Protobuild',
