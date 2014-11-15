@@ -11,7 +11,7 @@ final class HomeBannerControl extends Control {
     once and compile code for every platform, in any IDE or build system,
     on any operating system.
   </p>
-  <p><a class="btn btn-lg btn-success" href="https://protobuild.readthedocs.org/en/latest/getting_started.html" role="button">Get started with Protobuild</a></p>
+  <p><a class="btn btn-lg btn-success" style="white-space: normal;" href="https://protobuild.readthedocs.org/en/latest/getting_started.html" role="button">Get started with Protobuild</a></p>
 </div>
 EOF
     );
