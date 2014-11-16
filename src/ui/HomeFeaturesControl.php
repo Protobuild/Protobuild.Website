@@ -7,7 +7,7 @@ final class HomeFeaturesControl extends Control {
 <div class="row marketing">
   <h4><span class="glyphicon glyphicon-star"></span> One executable</h4>
   <p>
-    Protobuild ships as a single, 168kb executable in your repository.  Users
+    Protobuild ships as a single, 120kb executable in your repository.  Users
     don't need to install any software; just double-click Protobuild to
     generate projects.
   </p>
