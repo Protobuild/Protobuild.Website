@@ -72,6 +72,19 @@ final class PackageModel {
     return $this;
   }
   
+  public function getDefaultBranch() {
+    if ($this->defaultBranch === null || strlen($this->defaultBranch) === 0) {
+      return 'master';
+    }
+    
+    return $this->defaultBranch;
+  }
+  
+  public function setDefaultBranch($default_branch) {
+    $this->defaultBranch = $default_branch;
+    return $this;
+  }
+  
   public function getURI(UserModel $owner, $path = null) {
     if ($path === null) {
       return '/'.$owner->getCanonicalName().'/'.$this->getName();
@@ -109,6 +122,7 @@ final class PackageModel {
       'apiUrl' => make_api_url(ProtobuildEnv::get('domain').$this->getURI($owner)),
       'gitUrl' => $git_url,
       'description' => $this->getDescription(),
+      'defaultBranch' => $this->getDefaultBranch(),
     );
   }
   
@@ -119,6 +133,7 @@ final class PackageModel {
       'gitURL' => $this->getGitURL(),
       'description' => $this->getDescription(),
       'type' => $this->getType(),
+      'defaultBranch' => $this->getDefaultBranch(),
     );
     
     $indexes = array(
@@ -148,12 +163,14 @@ final class PackageModel {
     $props_googleID = idx($props, 'googleID');
     $props_gitURL = idx($props, 'gitURL');
     $props_description = idx($props, 'description');
+    $props_defaultBranch = idx($props, 'defaultBranch');
     
     $value_name = null;
     $value_type = null;
     $value_googleID = null;
     $value_gitURL = null;
     $value_description = null;
+    $value_defaultBranch = null;
     
     if ($props_name !== null) {
       $value_name = $props_name->getStringValue();
@@ -174,6 +191,10 @@ final class PackageModel {
     if ($props_description !== null) {
       $value_description = $props_description->getStringValue();
     }
+    
+    if ($props_defaultBranch !== null) {
+      $value_defaultBranch = $props_defaultBranch->getStringValue();
+    }
         
     $model
       ->setKey(head($entity->getKey()->getPath())->getId())
@@ -181,7 +202,8 @@ final class PackageModel {
       ->setType($value_type)
       ->setGoogleID($value_googleID)
       ->setGitURL($value_gitURL)
-      ->setDescription($value_description);
+      ->setDescription($value_description)
+      ->setDefaultBranch($value_defaultBranch);
     
     return $model;
   }

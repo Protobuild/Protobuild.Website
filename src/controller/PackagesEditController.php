@@ -15,11 +15,13 @@ final class PackagesEditController extends ProtobuildController {
     $error_type = null;
     $error_name = null;
     $error_git = null;
+    $error_branch = null;
     $error_desc = null;
     
     $value_type = null;
     $value_name = null;
     $value_git = null;
+    $value_branch = null;
     $value_desc = null;
     
     $caption_name = '';
@@ -42,6 +44,7 @@ final class PackagesEditController extends ProtobuildController {
       } else {
         $value_name = $current->getName();
         $value_type = $current->getType();
+        $value_branch = $current->getDefaultBranch();
         $value_git = $current->getGitURL();
         $value_desc = $current->getDescription();
       }
@@ -68,6 +71,7 @@ final class PackagesEditController extends ProtobuildController {
       
       $value_git = $_POST['git'];
       $value_desc = $_POST['desc'];
+      $value_branch = $_POST['defaultBranch'];
       
       $existing = id(new PackageModel())
         ->loadByUserAndName($user, $value_name);
@@ -81,6 +85,7 @@ final class PackagesEditController extends ProtobuildController {
               ->setType($value_type)
               ->setGitURL($value_git)
               ->setDescription($value_desc)
+              ->setDefaultBranch($value_branch)
               ->setGoogleID($user->getGoogleID())
               ->create();
             
@@ -94,7 +99,8 @@ final class PackagesEditController extends ProtobuildController {
           } else {
             $current
               ->setGitURL($value_git)
-              ->setDescription($value_desc);
+              ->setDescription($value_desc)
+              ->setDefaultBranch($value_branch);
             $current->update();
             
             try {
@@ -156,6 +162,13 @@ final class PackagesEditController extends ProtobuildController {
           ->setValue($value_git)
           ->setError($error_git)
           ->setPlaceholder('Full URL to the Git repository (optional)'))
+        ->appendChild(id(new FormTextInput())
+          ->setName('defaultBranch')
+          ->setLabel('Default Branch')
+          ->setValue($value_branch)
+          ->setError($error_branch)
+          ->setPlaceholder(
+            'Specify a default branch, or leave blank for master'))
         ->appendChild(id(new FormTextareaInput())
           ->setName('desc')
           ->setLabel('Description')

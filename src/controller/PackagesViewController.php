@@ -66,12 +66,22 @@ EOF;
         $suffix = ' MyProject';
         break;
     }
+    
+    $branch_suffix = '';
+    if ($package->getDefaultBranch() !== 'master') {
+      $branch_suffix = '@'.$package->getDefaultBranch();
+    }
 
     $allow_delete = false;
     $kickstart = hsprintf(
       $kickstart,
       $instruction,
-      $prefix.'Protobuild.exe --'.$mode.' http://protobuild.org'.$package->getURI($user).$suffix);
+      $prefix.
+        'Protobuild.exe --'.
+        $mode.
+        ' http://protobuild.org'.$package->getURI($user).
+        $branch_suffix.
+        $suffix);
     
     $desc = phutil_tag('p', array(), $package->getFormattedDescription());
     
@@ -214,6 +224,19 @@ EOF
             'Adding new packages to a project defaults to the "master" branch '.
             'of those packages; without a "master" branch, projects will '.
             'always clone a source version by default.');
+      }
+      
+      if ($package->getDefaultBranch() !== 'master') {
+        if ($can_edit && idx($branches, $package->getDefaultBranch()) === null) {
+          $master_warning = id(new Panel())
+            ->setHeading('No "'.$package->getDefaultBranch().'" branch')
+            ->setType('danger')
+            ->appendChild(
+              'You have not configured a "'.$package->getDefaultBranch().'" '.
+              'branch for this package.  When users add your package using '.
+              'the URL above (with the default branch specified), the project '.
+              'will clone a source version');
+        }
       }
       
       $versions_html = array(

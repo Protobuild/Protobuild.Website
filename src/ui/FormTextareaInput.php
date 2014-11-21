@@ -16,6 +16,7 @@ final class FormTextareaInput extends FormControl {
         'class' => 'form-control',
         'id' => $this->getName(),
         'name' => $this->getName(),
+        'rows' => 10,
       ) + $this->getDisabledArray(),
       $this->value);
   }
