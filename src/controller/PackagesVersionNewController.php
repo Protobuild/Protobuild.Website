@@ -110,6 +110,13 @@ final class PackagesVersionNewController extends ProtobuildController {
     
     $options = array();
     switch ($package->getType()) {
+      case PackageModel::TYPE_GLOBAL_TOOL:
+        $options = array(
+          'Linux' => 'Linux',
+          'MacOS' => 'MacOS',
+          'Windows' => 'Windows',
+        );
+        break;
       case PackageModel::TYPE_LIBRARY:
         $options = array(
           'Android' => 'Android',

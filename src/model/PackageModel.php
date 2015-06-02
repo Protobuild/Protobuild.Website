@@ -13,6 +13,7 @@ final class PackageModel {
   
   const TYPE_LIBRARY = 'library';
   const TYPE_TEMPLATE = 'template';
+  const TYPE_GLOBAL_TOOL = 'global-tool';
   
   public function __construct() {
     $this->datastore = id(new GoogleService())->getGoogleCloudDatastore();

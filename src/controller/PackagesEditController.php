@@ -155,6 +155,7 @@ final class PackagesEditController extends ProtobuildController {
           ->setOptions(array(
             PackageModel::TYPE_LIBRARY => 'Library',
             PackageModel::TYPE_TEMPLATE => 'Template',
+            PackageModel::TYPE_GLOBAL_TOOL => 'Global Tool',
           )))
         ->appendChild(id(new FormTextInput())
           ->setName('git')

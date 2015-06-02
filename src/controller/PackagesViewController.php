@@ -57,6 +57,7 @@ EOF;
     $suffix = '';
     switch ($package->getType()) {
       case PackageModel::TYPE_LIBRARY:
+      case PackageModel::TYPE_GLOBAL_TOOL:
         $instruction = 'Add this package to your project by running:';
         $mode = 'add';
         break;
