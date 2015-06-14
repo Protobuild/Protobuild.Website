@@ -7,7 +7,7 @@ final class HomeFeaturesControl extends Control {
 <div class="row marketing">
   <h4><span class="glyphicon glyphicon-star"></span> One executable</h4>
   <p>
-    Protobuild ships as a single, 120kb executable in your repository.  Users
+    Protobuild ships as a single, 150kb executable in your repository.  Users
     don't need to install any software; just double-click Protobuild to
     generate projects.
   </p>
@@ -34,11 +34,12 @@ final class HomeFeaturesControl extends Control {
     Protobuild allows you to output projects in the exact format you require.
   </p>
 
-  <h4><span class="glyphicon glyphicon-folder-close"></span> Simplified libraries</h4>
+  <h4><span class="glyphicon glyphicon-folder-close"></span> Package management</h4>
   <p>
-    Including a third-party library that uses Protobuild is as simple as
-    <code>git submodule add</code>.  Protobuild automatically loads subfolders
-    for additional projects and allows them to be referenced.
+    Protobuild includes a powerful package management system, which supports
+    true cross-platform packages (so you can P/Invoke in a library), 
+    dual source/binary packages (allowing you to switch to source code for a library
+    when you need to debug it) and support for NuGet.  <a href="/index">Find out more</a>.
   </p>
 
   <h4><span class="glyphicon glyphicon-leaf"></span> Build only what you need</h4>
