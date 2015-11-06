@@ -8,6 +8,7 @@ final class RouteDelegation {
       '/' => 'HomeController',
       '/index' => 'IndexController',
       '/search' => 'SearchController',
+      '/get' => 'GetController',
       
       // Login and account setup
       '/oauth2callback' => 'OAuth2CallbackController',
