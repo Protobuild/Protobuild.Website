@@ -7,7 +7,22 @@ final class GetController extends ProtobuildController {
   }
   
   public function processRequest(array $data) {
-    throw new ProtobuildRedirectException("https://github.com/hach-que/Protobuild/raw/master/Protobuild.exe");
+    switch (idx($data, 'platform')) {
+      case 'windows':
+        $uri = "https://s3.amazonaws.com/redpointx/ProtobuildWebInstall.exe";
+        break;
+      case 'mac':
+        $uri = "https://s3.amazonaws.com/redpointx/ProtobuildMacOSInstall.sh";
+        break;
+      case 'linux':
+        $uri = "https://s3.amazonaws.com/redpointx/ProtobuildLinuxInstall.sh";
+        break;
+      default:
+        $uri = "https://github.com/hach-que/Protobuild/raw/master/Protobuild.exe";
+        break;
+    }
+  
+    throw new ProtobuildRedirectException($uri);
   }
   
 }

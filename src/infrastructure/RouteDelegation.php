@@ -9,6 +9,7 @@ final class RouteDelegation {
       '/index' => 'IndexController',
       '/search' => 'SearchController',
       '/get' => 'GetController',
+      '/get/(?P<platform>[^/]+)' => 'GetController',
       
       // Login and account setup
       '/oauth2callback' => 'OAuth2CallbackController',
