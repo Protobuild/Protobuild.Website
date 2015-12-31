@@ -13,12 +13,12 @@ final class HomeBannerControl extends Control {
       'mac' => array(
         'name' => 'Download for Mac OS X',
         'url' => null,
-        'cmd' => 'wget http://protobuild.org/get/mac | sudo bash',
+        'cmd' => 'curl -L http://protobuild.org/get/mac | bash',
       ),
       'linux' => array(
         'name' => 'Download for Linux',
         'url' => null,
-        'cmd' => 'wget http://protobuild.org/get/linux | sudo bash',
+        'cmd' => 'curl -L http://protobuild.org/get/linux | bash',
       ),
     );
     
