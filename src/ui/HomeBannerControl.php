@@ -7,18 +7,18 @@ final class HomeBannerControl extends Control {
     $installers = array(
       'windows' => array(
         'name' => 'Download for Windows',
-        'url' => 'http://protobuild.org/get/windows',
+        'url' => ProtobuildEnv::get('domain').'/get/windows',
         'cmd' => null,
       ),
       'mac' => array(
         'name' => 'Download for Mac OS X',
         'url' => null,
-        'cmd' => 'curl -L http://protobuild.org/get/mac | bash',
+        'cmd' => 'curl -L '.ProtobuildEnv::get('domain').'/get/mac | bash',
       ),
       'linux' => array(
         'name' => 'Download for Linux',
         'url' => null,
-        'cmd' => 'curl -L http://protobuild.org/get/linux | bash',
+        'cmd' => 'curl -L '.ProtobuildEnv::get('domain').'/get/linux | bash',
       ),
     );
     
