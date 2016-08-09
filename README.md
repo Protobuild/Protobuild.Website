@@ -19,7 +19,7 @@ git clone https://github.com/hach-que/Protobuild.Website protobuild
 Configuration
 --------------
 
-You will need to create a project on [https://cloud.google.com/](Google Cloud Platform).  This application will be used for package storage, as well as hosting the [https://github.com/hach-que/Protobuild.Website.Search](full text searching application).
+You will need to create a project on [Google Cloud Platform](https://cloud.google.com/).  This application will be used for package storage, as well as hosting the [full text searching application](https://github.com/hach-que/Protobuild.Website.Search).
 
 Once you have created a project, you need to turn on the Google Cloud Datastore API and Google Cloud Storage API.
 
@@ -42,5 +42,5 @@ Now you need to create a JSON file under `conf/local.json` (in the root of the r
 }
 ```
 
-For the offical Protobuild index, the full text search endpoint is `http://api.protobuild-index.appspot.com`.  You'll probably need to fork the [https://github.com/hach-que/Protobuild.Website.Search](full text searching application), change the application name, and redeploy it to your own project using the Google Developer console.  More information about pushing new App Engine applications can be found in Google's documentation.
+For the offical Protobuild index, the full text search endpoint is `http://api.protobuild-index.appspot.com`.  You'll probably need to fork the [full text searching application](https://github.com/hach-que/Protobuild.Website.Search), change the application name, and redeploy it to your own project using the Google Developer console.  More information about pushing new App Engine applications can be found in Google's documentation.
 
