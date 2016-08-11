@@ -4,7 +4,11 @@ final class BranchDeleteController extends ProtobuildController {
   
   public function processRequest(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
-    
+
+    if ($package->getGitURL() != null) {
+      throw new ProtobuildException(CommonErrors::PACKAGE_BRANCHES_MANAGED_BY_GIT);
+    }
+
     $branch_name = idx($data, 'name');
     $branch = id(new BranchModel())
       ->loadAllForPackage($user, $package);

@@ -98,8 +98,13 @@ EOF
     }
     
     $versions = id(new VersionModel())->loadAllForPackage($user, $package);
-    $branches = id(new BranchModel())->loadAllForPackage($user, $package);
-    $branches = mpull($branches, null, 'getBranchName');
+
+    if ($package->getGitURL() == null) { 
+      $branches = id(new BranchModel())->loadAllForPackage($user, $package);
+      $branches = mpull($branches, null, 'getBranchName');
+    } else {
+      $branches = array();
+    }
     
     if (count($versions) === 0 && strlen($package->getGitURL()) === 0) {
       $kickstart = id(new Panel())
@@ -128,44 +133,52 @@ EOF
       $versions_items = array();
       $branches_items = array();
       
-      foreach ($branches as $branch) {
-        $links = null;
-        if ($can_edit) {
-          $links = array(
-            phutil_tag(
-              'a', 
-              array('href' => $package->getURI($user, 'branch/edit/'.$branch->getBranchName())),
-              'Edit Branch'),
-            ' - ',
-            phutil_tag(
-              'a', 
-              array('href' => $package->getURI($user, 'branch/delete/'.$branch->getBranchName())),
-              'Delete Branch'),
-          );
-        }
-        
-        $message = 'Branch pointing to '.$branch->getVersionName().'.';
-        $message = phutil_tag('p', array(), $message);
-        if (idx($versions_grouped, $branch->getVersionName()) === null) {
-          $message = array(
-            $message,
-            phutil_tag(
-              'p',
-              array(),
+      if ($package->getGitURL() == null) {
+        foreach ($branches as $branch) {
+          $links = null;
+          if ($can_edit) {
+            $links = array(
               phutil_tag(
-                'strong',
+                'a', 
+                array('href' => $package->getURI($user, 'branch/edit/'.$branch->getBranchName())),
+                'Edit Branch'),
+              ' - ',
+              phutil_tag(
+                'a', 
+                array('href' => $package->getURI($user, 'branch/delete/'.$branch->getBranchName())),
+                'Delete Branch'),
+            );
+          }
+          
+          $message = 'Branch pointing to '.$branch->getVersionName().'.';
+          $message = phutil_tag('p', array(), $message);
+          if (idx($versions_grouped, $branch->getVersionName()) === null) {
+            $message = array(
+              $message,
+              phutil_tag(
+                'p',
                 array(),
-                'WARNING: The commit this branch points to is missing!')));
+                phutil_tag(
+                  'strong',
+                  array(),
+                  'WARNING: The commit this branch points to is missing!')));
+          }
+          
+          $branches_items[] = id(new Panel())
+            ->setHeading($branch->getBranchName(). ' (branch)')
+            ->setType('success')
+            ->appendChild(
+              array(
+                $message,
+                $links
+              ));
         }
-        
+      } else {
         $branches_items[] = id(new Panel())
-          ->setHeading($branch->getBranchName(). ' (branch)')
+          ->setHeading('Automatic Branches')
           ->setType('success')
           ->appendChild(
-            array(
-              $message,
-              $links
-            ));
+            'The branches for this package are automatically sourced from Git.');
       }
       
       foreach ($versions_grouped as $version_name => $version_platforms) {
@@ -216,27 +229,29 @@ EOF
       }
       
       $master_warning = null;
-      if ($can_edit && idx($branches, 'master') === null) {
-        $master_warning = id(new Panel())
-          ->setHeading('No "master" branch')
-          ->setType('danger')
-          ->appendChild(
-            'You have not configured a "master" branch for this package.  '.
-            'Adding new packages to a project defaults to the "master" branch '.
-            'of those packages; without a "master" branch, projects will '.
-            'always clone a source version by default.');
-      }
-      
-      if ($package->getDefaultBranch() !== 'master') {
-        if ($can_edit && idx($branches, $package->getDefaultBranch()) === null) {
+      if ($package->getGitURL() == null) {
+        if ($can_edit && idx($branches, 'master') === null) {
           $master_warning = id(new Panel())
-            ->setHeading('No "'.$package->getDefaultBranch().'" branch')
+            ->setHeading('No "master" branch')
             ->setType('danger')
             ->appendChild(
-              'You have not configured a "'.$package->getDefaultBranch().'" '.
-              'branch for this package.  When users add your package using '.
-              'the URL above (with the default branch specified), the project '.
-              'will clone a source version');
+              'You have not configured a "master" branch for this package.  '.
+              'Adding new packages to a project defaults to the "master" branch '.
+              'of those packages; without a "master" branch, projects will '.
+              'always clone a source version by default.');
+        }
+      
+        if ($package->getDefaultBranch() !== 'master') {
+          if ($can_edit && idx($branches, $package->getDefaultBranch()) === null) {
+            $master_warning = id(new Panel())
+              ->setHeading('No "'.$package->getDefaultBranch().'" branch')
+              ->setType('danger')
+              ->appendChild(
+                'You have not configured a "'.$package->getDefaultBranch().'" '.
+                'branch for this package.  When users add your package using '.
+                'the URL above (with the default branch specified), the project '.
+                'will clone a source version');
+          }
         }
       }
       
@@ -266,7 +281,7 @@ EOF
       ),
       'New Branch'
     );
-    if (count($versions) === 0) {
+    if (count($versions) === 0 || $package->getGitURL() != null) {
       $new_branch = phutil_tag(
         'a',
         array(

@@ -59,6 +59,15 @@ final class BranchModel {
     return $this;
   }
   
+  public function getIsAutoBranch() {
+    return $this->_isAutoBranch;
+  }
+  
+  public function setIsAutoBranch($autobranch) {
+    $this->_isAutoBranch = $autobranch;
+    return $this;
+  }
+  
   public function getJSONArray() {
     return array(
       'ownerID' => $this->getGoogleID(),
@@ -135,6 +144,10 @@ final class BranchModel {
   }
   
   public function create() {
+    if ($this->getIsAutoBranch()) {
+      throw new Exception('Automatic branches can not be created.');
+    }
+
     $path = new Google_Service_Datastore_KeyPathElement();
     $path->setKind(self::KIND);
     $path->setId(null);
@@ -165,6 +178,10 @@ final class BranchModel {
   }
   
   public function update() {
+    if ($this->getIsAutoBranch()) {
+      throw new Exception('Automatic branches can not be updated.');
+    }
+
     $path = new Google_Service_Datastore_KeyPathElement();
     $path->setKind(self::KIND);
     $path->setId($this->getKey());
@@ -190,6 +207,10 @@ final class BranchModel {
   }
   
   public function delete() {
+    if ($this->getIsAutoBranch()) {
+      throw new Exception('Automatic branches can not be deleted.');
+    }
+
     $path = new Google_Service_Datastore_KeyPathElement();
     $path->setKind(self::KIND);
     $path->setId($this->getKey());
@@ -213,6 +234,31 @@ final class BranchModel {
     UserModel $user,
     PackageModel $package) {
     
+    if ($package->getGitURL() != null) {
+      // Load the branches from Git instead of Google Cloud Datastore.
+      list($out, $err) = execx('git ls-remote --heads %s', $package->getGitURL());
+      $entries = phutil_split_lines($out);
+      $results = array();
+      for ($i = 0; $i < count($entries); $i++) {
+        $s = explode("\t", $entries[$i]);
+        if (count($s) >= 2) {
+          $branch_name = trim($s[1]);
+          if (substr($branch_name, 0, strlen("refs/heads/")) === "refs/heads/") {
+            $branch_name = substr($branch_name, strlen("refs/heads/"));
+          } else {
+            continue;
+          }
+          $results[] = id(new BranchModel())
+            ->setPackageName($package->getName())
+            ->setBranchName($branch_name)
+            ->setVersionName(trim($s[0]))
+            ->setIsAutoBranch(true);
+        }
+      }
+      return $results;
+    }
+
+
     $id_value = new Google_Service_Datastore_Value();
     $id_value->setStringValue($user->getGoogleID());
     

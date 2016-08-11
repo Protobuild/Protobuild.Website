@@ -5,6 +5,10 @@ final class BranchEditController extends ProtobuildController {
   public function processApi(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     
+    if ($package->getGitURL() != null) {
+      throw new ProtobuildException(CommonErrors::PACKAGE_BRANCHES_MANAGED_BY_GIT);
+    }
+
     $branch_name = idx($data, 'name');
     $is_new = $branch_name === null;
     
@@ -81,6 +85,10 @@ final class BranchEditController extends ProtobuildController {
   public function processRequest(array $data) {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     
+    if ($package->getGitURL() != null) {
+      throw new ProtobuildException(CommonErrors::PACKAGE_BRANCHES_MANAGED_BY_GIT);
+    }
+
     $branch_name = idx($data, 'name');
     $is_new = $branch_name === null;
     

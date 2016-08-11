@@ -15,6 +15,7 @@ final class CommonErrors extends Phobject {
   
   const PACKAGE_HAS_NO_VERSIONS = 'Package has no available versions.';
   const PACKAGE_STILL_HAS_BRANCHES_OR_VERSIONS = 'Package still has branches or versions.';
+  const PACKAGE_BRANCHES_MANAGED_BY_GIT = 'Package branches are obtained from the source URL, so you can\'t configure branches for this package.';
   
   const VERSION_ALREADY_HAS_FILE = 'This version already has a file uploaded.';
   
