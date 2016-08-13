@@ -6,7 +6,9 @@ final class BranchEditController extends ProtobuildController {
     list($user, $package) = $this->loadOwnerAndPackageFromRequestAndRequireEdit($data);
     
     if ($package->getGitURL() != null) {
-      throw new ProtobuildException(CommonErrors::PACKAGE_BRANCHES_MANAGED_BY_GIT);
+      // Not strictly an error for compatibility with Protobuild binary, but
+      // the operation is ignored.
+      return array(CommonErrors::PACKAGE_BRANCHES_MANAGED_BY_GIT);
     }
 
     $branch_name = idx($data, 'name');
