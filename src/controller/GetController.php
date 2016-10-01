@@ -18,7 +18,7 @@ final class GetController extends ProtobuildController {
         $uri = "https://s3.amazonaws.com/redpointx/ProtobuildLinuxInstall.sh";
         break;
       default:
-        $uri = "https://github.com/hach-que/Protobuild/raw/master/Protobuild.exe";
+        $uri = "https://github.com/Protobuild/Protobuild/raw/master/Protobuild.exe";
         break;
     }
   
