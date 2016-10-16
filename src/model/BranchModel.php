@@ -7,6 +7,7 @@ final class BranchModel {
   private $packageName;
   private $branchName;
   private $versionName;
+  private $_isAutoBranch;
   
   const KIND = 'branch';
   
