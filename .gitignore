@@ -2,3 +2,4 @@
 bin/
 obj/
 project.lock.json
+src/Protobuild.Website/Credentials/
