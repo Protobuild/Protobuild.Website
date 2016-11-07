@@ -1,0 +1,24 @@
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Protobuild.Website.Controllers
+{
+    public class GetController : Controller
+    {
+        [Route("/get")]
+        [Route("/get/{platform}")]
+        public IActionResult Index(string platform = null)
+        {
+            switch (platform)
+            {
+                case "windows":
+                    return Redirect("https://s3.amazonaws.com/redpointx/ProtobuildWebInstall.exe");
+                case "mac":
+                    return Redirect("https://s3.amazonaws.com/redpointx/ProtobuildMacOSInstall.sh");
+                case "linux":
+                    return Redirect("https://s3.amazonaws.com/redpointx/ProtobuildLinuxInstall.sh");
+                default:
+                    return Redirect("https://github.com/Protobuild/Protobuild/raw/master/Protobuild.exe");
+            }
+        }
+    }
+}

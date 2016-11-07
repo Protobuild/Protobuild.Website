@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Protobuild</title>
+
+    <environment names="Development">
+        <link rel="stylesheet" href="~/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/jumbotron-narrow.css" />
+    </environment>
+    <environment names="Staging,Production">
+        <link rel="stylesheet" href="~/css/bootstrap.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true"/>
+    </environment>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <ul class="nav nav-pills pull-right">
+        @{
+            var homeClass = "";
+            var indexClass = "";
+
+            if (Context.Request.Path == "/")
+            {
+                homeClass = "active";
+            }
+            else
+            {
+                indexClass = "active";
+            }
+
+            <li class="@homeClass"><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="@indexClass"><a asp-area="" asp-controller="Index" asp-action="Index">
+                <span class="hidden-xs">Package Index</span>
+                <span class="hidden-sm hidden-md hidden-lg">Index</span>
+            </a></li>
+            <li class="hidden-xs"><a href="https://protobuild.readthedocs.org/">Documentation</a></li>
+            <li class="hidden-xs"><a href="https://github.com/Protobuild/Protobuild">Source Code</a></li>
+            <li class="hidden-xs"><a href="https://github.com/Protobuild/Protobuild/issues">Support</a></li>
+        }
+        </ul>
+        <h3 class="text-muted">Protobuild</h3>
+    </div>
+    
+    @RenderBody()
+
+    <div class="footer">
+        <footer></footer>
+    </div>
+</div>
+
+<script src="~/js/jquery.min.js"></script>
+<script src="~/js/bootstrap.min.js"></script>
+<script src="~/js/gzip.js"></script>
+<script src="~/js/upload.js"></script>
+<script type="text/javascript">window.SEARCH_URI = "https://api-dot-protobuild-index.appspot.com";</script>
+<script src="~/js/search.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+    
+@RenderSection("scripts", required: false)
+</body>
+</html>

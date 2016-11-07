@@ -1,0 +1,179 @@
+/* Space out content a bit */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Custom page header */
+.header {
+  border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  padding-bottom: 19px;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+}
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  padding: 14px 24px;
+  font-size: 21px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 40px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+h4 > span.glyphicon {
+  font-size: 15px;
+  margin-right: 2px;
+}
+
+/* Package version lists */
+div.panel > a.list-group-item {
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+div.panel > a.list-group-item:nth-of-type(1) {
+  border-top: none;
+}
+
+/* Dynamic file upload */
+div.dynamic-file-upload, div.dynamic-file-upload-hover {
+  border: 3px dashed #ddd;
+  text-align: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+div.dynamic-file-upload-hover {
+  background-color: #cfc;
+}
+
+form > div.form-group:last-child, form > div.form-group:last-child > p {
+  margin-bottom: 0px;
+}
+
+div.progress { 
+  margin-bottom: 4px;
+}
+
+@media screen and (min-width: 768px) {
+  div.fourohfour {
+    font-size: 160px;
+    color: #AAA;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0px;
+    margin-top: -20px;
+    margin-bottom: 0px;
+    position: relative;
+  }
+
+  div.error-message {
+    width: 400px;
+    margin: auto;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  ol.breadcrumb {
+    width: 70%;
+  }
+  
+  #breadcrumb-search {
+    float: right; 
+    width: 28%;
+  }
+  
+  #breadcrumb-search input {
+    height: 36px; 
+    line-height: 18px;
+  }
+  
+  #breadcrumb-search button {
+    height: 36px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  div.fourohfour {
+    font-size: 160px;
+    color: #AAA;
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 0px;
+    margin-bottom: 0px;
+    position: relative;
+  }
+
+  div.error-message {
+    max-width: 400px;
+    margin: auto;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  #breadcrumb-search-form {
+    display: none;
+  }
+}
+
+div.panel-body > p:last-child {
+  margin-bottom: 0px;
+}
