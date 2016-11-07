@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Protobuild.Website.Authorization;
 
 namespace Protobuild.Website.Controllers
 {
-    [Authorize]
     public class LoginController : Controller
     {
+        [ProtobuildAuthorized]
         [Route("/login")]
         public IActionResult Index()
         {

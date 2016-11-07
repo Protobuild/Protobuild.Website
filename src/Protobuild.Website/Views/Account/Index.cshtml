@@ -1,0 +1,74 @@
+﻿@model Protobuild.Website.ViewModels.UserViewModel
+
+<breadcrumbs user="@Model.User" />
+
+@if (Model.Packages.Count == 0)
+{
+    <div class="alert alert-warning" role="alert">
+        This @Model.User.Term hasn't uploaded any packages.
+    </div>
+}
+else
+{
+    foreach (var package in Model.Packages)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a href="/@Model.User.CanonicalName/@package.Name">@package.Name</a>
+                </h3>
+            </div>
+            <div class="panel-body">
+                @package.Description
+            </div>
+        </div>
+    }
+}
+
+@if (!Model.User.IsOrganisation && false /* allowed to view user API key */)
+{
+    <h3>API Key</h3>
+    <p>
+        Your API key is:
+        <strong>@Model.User.ApiKey</strong>
+        .  Guard this key as it can be used to read / write packages on your account.
+    </p>
+}
+
+@if (Model.User.IsOrganisation)
+{
+    <h3>Organisation Owners</h3>
+    <p>This organisation is owned by:</p>
+    <ul>
+        @foreach (var owner in Model.Owners)
+        {
+            <li>
+                <a href="@owner.GetUrl()">@owner.CanonicalName</a>
+                @if (false /* can remove owner */)
+                {
+                    <text> (</text>
+                    <a href="@Model.User.GetUrl("owner/remove/" + owner.CanonicalName)">Remove</a>
+                    <text>)</text>
+                }
+            </li>
+        }
+    </ul>
+}
+
+<div class="btn-group">
+    @if (false /* can edit user */)
+    {
+        <a type="button" class="btn btn-primary" href="@Model.User.GetUrl("new")">New Package</a>
+        <a type="button" class="btn btn-primary" href="@Model.User.GetUrl("rename")">Rename Account</a>
+
+        @if (Model.User.IsOrganisation)
+        {
+            <a type="button" class="btn btn-primary" href="@Model.User.GetUrl("owner/add")">Add Owner</a>
+        }
+        else
+        {
+            /* Only show New Organisation when we look at our own account. */
+            <a type="button" class="btn btn-primary" href="/organisation/new">New Organisation</a>
+        }
+    }
+</div><br /><br />

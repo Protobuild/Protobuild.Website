@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Protobuild.Website.Authorization;
 
 namespace Protobuild.Website.Controllers
 {
     public class LogoutController : Controller
     {
+        [ProtobuildAuthorized]
         [Route("/logout")]
         public IActionResult Index()
         {
-            return View();
+            HttpContext.Session.Clear();
+            return Redirect("/");
         }
     }
 }

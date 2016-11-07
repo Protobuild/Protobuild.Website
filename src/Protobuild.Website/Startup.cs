@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Protobuild.Website.Services;
+using Protobuild.Website.Exceptions;
 
 namespace Protobuild.Website
 {
@@ -29,7 +31,10 @@ namespace Protobuild.Website
         {
             services.AddDistributedMemoryCache();
             services.AddSession();
+
             services.AddMvc();
+
+            services.AddSingleton<IRepository, GoogleDatastoreRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,6 +42,8 @@ namespace Protobuild.Website
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseHttpException();
 
             if (env.IsDevelopment())
             {

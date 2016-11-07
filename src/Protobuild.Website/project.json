@@ -1,4 +1,4 @@
-﻿{
+{
   "dependencies": {
     "Microsoft.NETCore.App": {
       "version": "1.0.1",
@@ -21,9 +21,9 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
-    "Google.Apis.Datastore.v1": "1.18.0.663",
     "Microsoft.AspNetCore.Session": "1.0.0",
-    "Microsoft.AspNetCore.Authorization": "1.0.0"
+    "Microsoft.AspNetCore.Authorization": "1.0.0",
+    "Google.Datastore.V1": "1.0.0-beta04"
   },
 
   "tools": {
@@ -57,7 +57,8 @@
       "wwwroot",
       "**/*.cshtml",
       "appsettings.json",
-      "web.config"
+      "web.config",
+      "Credentials/*.json"
     ]
   },
 
