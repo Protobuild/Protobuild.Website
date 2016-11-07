@@ -5,4 +5,3 @@
 /// <reference path="js/search.js" />
 /// <reference path="js/site.js" />
 /// <reference path="js/upload.js" />
-/// <reference path="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js" />
