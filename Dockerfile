@@ -13,7 +13,7 @@ RUN dotnet publish -c Release -o ../../pkg
 ADD extra/nginx /srv/nginx
 ADD extra/run.sh /srv/extra/run.sh
 ADD extra/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-RUN mkdir /var/log/nginx /var/log/supervisor
+RUN mkdir -pv /var/log/nginx /var/log/supervisor
 
 ENV ASPNETCORE_ENVIRONMENT Production
 ENV ASPNETCORE_URLS http://+:5000
