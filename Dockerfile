@@ -20,4 +20,4 @@ RUN chmod a+X /srv/extra/run.sh
 ENV ASPNETCORE_ENVIRONMENT Production
 ENV ASPNETCORE_URLS http://+:5000
 WORKDIR /srv/protobuild/pkg
-ENTRYPOINT ["/usr/bin/supervisord"]
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
