@@ -13,5 +13,9 @@ namespace Protobuild.Website.ViewModels
         public List<PackageModel> Packages { get; set; }
 
         public List<UserModel> Owners { get; set; }
+
+        public bool ViewerCanEditUser { get; set; }
+
+        public bool ViewerIsUser { get; set; }
     }
 }

@@ -1,0 +1,44 @@
+﻿@model System.Exception
+@{
+    var httpException = Model as Protobuild.Website.Exceptions.HttpException;
+    var protobuildException = Model as Protobuild.Website.Exceptions.ProtobuildException;
+}
+
+@if (protobuildException != null)
+{
+    <div class="fourohfour">
+        @if (protobuildException.StatusCode == 404)
+        {
+            <text>404</text>
+        }
+        else if (protobuildException.StatusCode == 403)
+        {
+            <text>&times;</text>
+        }
+        else
+        {
+            <text>&times;</text>
+        }
+    </div>
+    <div class="alert alert-danger error-message" role="alert">
+        @protobuildException.ProtobuildMessage
+    </div>
+}
+else if (httpException != null && httpException.StatusCode == 404)
+{
+    <div class="fourohfour">
+        404
+    </div>
+    <div class="alert alert-danger error-message" role="alert">
+        Resource not found.
+    </div>
+}
+else
+{
+    <div class="fourohfour">
+        &times;
+    </div>
+    <div class="alert alert-danger error-message" role="alert">
+        An unexpected error occurred.  Please try again later.
+    </div>
+}

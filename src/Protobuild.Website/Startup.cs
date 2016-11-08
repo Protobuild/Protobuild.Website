@@ -35,6 +35,7 @@ namespace Protobuild.Website
             services.AddMvc();
 
             services.AddSingleton<IRepository, GoogleDatastoreRepository>();
+            services.AddSingleton<IGitQueryService, GitQueryService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,16 +44,17 @@ namespace Protobuild.Website
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            app.UseHttpException();
+            //app.UseHttpException();
 
-            if (env.IsDevelopment())
+            if (false && env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/error");
+                app.UseStatusCodePagesWithReExecute("/error/{0}");
             }
 
             app.UseStaticFiles();

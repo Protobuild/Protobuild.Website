@@ -1,42 +1,213 @@
 ﻿@model Protobuild.Website.ViewModels.PackageViewModel
+@using Protobuild.Website
 @using Protobuild.Website.Models
+@{
+    ViewBag.Title = Model.User.CanonicalName + " / " + Model.Package.Name + " (Protobuild)";
+}
 
 <breadcrumbs user="@Model.User" package="@Model.Package" />
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <form role="form" method="POST">
-            <p>
-                @if (Model.Package.Type == PackageModel.TypeLibrary || Model.Package.Type == PackageModel.TypeGlobalTool)
-                {
-                    <text>Add this package to your project by running:</text>
-                }
-                else if (Model.Package.Type == PackageModel.TypeTemplate)
-                {
-                    <text>Start with this project template by running:</text>
-                }
-            </p>
-            @{ 
-                var isWindows = false;
-                var userAgent = ViewContext.HttpContext.Request.Headers.FirstOrDefault(x => x.Key == "User-Agent");
-                if (userAgent.Value.Any(x => x.Contains("Windows")))
-                {
-                    isWindows = true;
-                }
+@if (Model.Versions.Count == 0 && string.IsNullOrWhiteSpace(Model.Package.GitUrl))
+{
+    <panel type="danger" heading="No source URL or binaries present">
+        This package can not be added to any projects as there is no
+        Git source URL configured, and no binary packages have been
+        uploaded.
+    </panel>
+}
+else
+{
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form role="form" method="POST">
+                <p>
+                    @if (Model.Package.Type == PackageModel.TypeLibrary || Model.Package.Type == PackageModel.TypeGlobalTool)
+                    {
+                        <text>Add this package to your project by running:</text>
+                    }
+                    else if (Model.Package.Type == PackageModel.TypeTemplate)
+                    {
+                        <text>Start with this project template by running:</text>
+                    }
+                </p>
+                @{
+                    var isWindows = false;
+                    var userAgent = ViewContext.HttpContext.Request.Headers.FirstOrDefault(x => x.Key == "User-Agent");
+                    if (userAgent.Value.Any(x => x.Contains("Windows")))
+                    {
+                        isWindows = true;
+                    }
 
-                var prefix = isWindows ? string.Empty : "mono ";
-                var instr = "TODO";
-            }
-            <div class="form-group" style="margin-bottom: 0px;">
-                <input type="text" class="form-control" disabled="disabled" value="@instr">
-            </div>
-        </form>
+                    var prefix = isWindows ? string.Empty : "mono ";
+
+                    var mode = string.Empty;
+                    if (Model.Package.Type == PackageModel.TypeLibrary || Model.Package.Type == PackageModel.TypeGlobalTool)
+                    {
+                        mode = "add";
+                    }
+                    else if (Model.Package.Type == PackageModel.TypeTemplate)
+                    {
+                        mode = "start";
+                    }
+
+                    var branchSuffix = string.Empty;
+                    if (Model.Package.DefaultBranch != null && Model.Package.DefaultBranch != "master")
+                    {
+                        branchSuffix = "@" + Model.Package.DefaultBranch;
+                    }
+
+                    var instr = prefix + "Protobuild.exe --" + mode + " " + ProtobuildEnv.GetDomain() + Model.Package.GetUrl(Model.User) + branchSuffix;
+                }
+                <div class="form-group" style="margin-bottom: 0px;">
+                    <input type="text" class="form-control" readonly style="cursor: text" onclick="this.select()" value="@instr">
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+}
 
-@if (!string.IsNullOrWhiteSpace(Model.Package.GitURL))
+@if (Model.JustUploaded)
+{
+    <div class="alert alert-success" role="alert">
+        <strong>Success!</strong>
+        Your package version has been uploaded successfully!
+    </div>
+}
+else if (Model.JustCreatedBranch)
+{
+    <div class="alert alert-success" role="alert">
+        <strong>Success!</strong>
+        Your branch has been created successfully.
+    </div>
+}
+
+<h2>@Model.Package.Name</h2>
+
+<p style="white-space: pre-line">@((Model.Package.Description ?? "").Trim())</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Package.GitUrl))
 {
     <h3>Source Code</h3>
     <p>The source code for this package resides at:</p>
-    <p><a href="@Model.Package.GitURL"><strong>@Model.Package.GitURL</strong></a></p>
+    <p><a href="@Model.Package.GitUrl"><strong>@Model.Package.GitUrl</strong></a></p>
 }
+
+<h3>Binary Versions</h3>
+@if (Model.Versions.Count == 0 && Model.Branches.Count == 0)
+{
+    <p>
+        No binary versions are present. Adding this module to your
+        project will clone a copy of the source code.
+    </p>
+}
+else
+{
+    var versionsGrouped = Model.Versions.GroupBy(x => x.VersionName).ToDictionary(k => k.Key, v => v.ToList());
+
+    if (Model.ViewerCanEditPackage && string.IsNullOrWhiteSpace(Model.Package.GitUrl))
+    {
+        if (!string.IsNullOrWhiteSpace(Model.Package.DefaultBranch))
+        {
+            if (Model.Branches.All(x => x.BranchName != Model.Package.DefaultBranch))
+            {
+                <panel type="danger" heading="No &quot;@(Model.Package.DefaultBranch)&quot; branch">
+                    You have not configured a "@(Model.Package.DefaultBranch)" branch for this package.
+                    When users add your package using the URL above (with the default branch
+                    specified), the project will clone a source version.
+                </panel>
+            }
+        }
+        else if (Model.Branches.All(x => x.BranchName != "master"))
+        {
+            <panel type="danger" heading="No &quot;master&quot; branch">
+                You have not configured a "master" branch for this package.
+                Adding new packages to a project defaults to the "master" branch
+                of those packages; without a "master" branch, projects will
+                always clone a source version by default.
+            </panel>
+        }
+    }
+
+    if (!string.IsNullOrWhiteSpace(Model.Package.GitUrl))
+    {
+        <panel type="success" heading="Automatic Branches">
+            The branches for this package are automatically sourced from Git.
+        </panel>
+    }
+    else
+    {
+        foreach (var branch in Model.Branches)
+        {
+            <panel type="success" heading="@(branch.BranchName) (branch)">
+                <p>Branch pointing to @branch.VersionName</p>
+
+                @if (!versionsGrouped.ContainsKey(branch.VersionName))
+                {
+                    <p><strong>WARNING: The commit this branch points to is missing!</strong></p>
+                }
+
+                @if (Model.ViewerCanEditPackage)
+                {
+                    <a href="@Model.Package.GetUrl(Model.User, "branch/edit/" + branch.BranchName)">Edit Branch</a>
+                    <text>-</text>
+                    <a href="@Model.Package.GetUrl(Model.User, "branch/delete/" + branch.BranchName)">Delete Branch</a>
+                }
+            </panel>
+        }
+    }
+
+    foreach (var version in versionsGrouped)
+    {
+        var versionName = version.Key;
+        var versionPlatforms = version.Value;
+
+        <panel heading="@versionName (commit)" nobody="true">
+            @foreach (var platform in versionPlatforms)
+            {
+                if (Model.ViewerCanEditPackage)
+                {
+                    if (platform.HasFile)
+                    {
+                        <a class="list-group-item list-group-item-danger" href="@Model.Package.GetUrl(Model.User, "version/upload/" + platform.Key)">
+                            <span class="badge">Binary Missing</span>
+                            @platform.PlatformName
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="list-group-item" href="@Model.Package.GetUrl(Model.User, "version/delete/" + platform.Key)">
+                            <span class="badge">Delete</span>
+                            @platform.PlatformName
+                        </a>
+                    }
+                }
+                else
+                {
+                    <a class="list-group-item">
+                        @platform.PlatformName
+                    </a>
+                }
+            }
+        </panel>
+    }
+}
+
+<buttongroup>
+    @if (Model.ViewerCanEditPackage)
+    {
+        <a type="button" class="btn btn-primary" href="@Model.Package.GetUrl(Model.User, "version/new")">Create and Upload New Version</a>
+        if (string.IsNullOrWhiteSpace(Model.Package.GitUrl))
+        {
+            <a type="button" class="btn btn-default" href="@Model.Package.GetUrl(Model.User, "branch/new")">New Branch</a>
+        }
+        else
+        {
+            <a type="button" class="btn btn-default" disabled="disabled">New Branch</a>
+        }
+        <a type="button" class="btn btn-default" href="@Model.Package.GetUrl(Model.User, "edit")">Edit Package</a>
+        if (Model.Branches.Count == 0 && Model.Versions.Count == 0)
+        {
+            <a type="button" class="btn btn-danger" href="@Model.Package.GetUrl(Model.User, "delete")">Delete Package</a>
+        }
+    }
+</buttongroup>

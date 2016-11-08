@@ -5,6 +5,7 @@ using Protobuild.Website.Services;
 using Protobuild.Website.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Protobuild.Website.ApiMiddleware;
 
 namespace Protobuild.Website.Controllers
 {
@@ -31,6 +32,7 @@ namespace Protobuild.Website.Controllers
             });
         }
 
+        [Api]
         [Route("/{user}/api")]
         public async Task<IActionResult> IndexApi(string user)
         {

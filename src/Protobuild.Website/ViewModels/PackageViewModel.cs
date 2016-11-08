@@ -12,5 +12,11 @@ namespace Protobuild.Website.ViewModels
         public List<VersionModel> Versions { get; set; }
 
         public List<BranchModel> Branches { get; set; }
+
+        public bool JustUploaded { get; set; }
+
+        public bool JustCreatedBranch { get; set; }
+
+        public bool ViewerCanEditPackage { get; set; }
     }
 }

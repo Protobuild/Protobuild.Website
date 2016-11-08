@@ -1,4 +1,7 @@
 ﻿@model Protobuild.Website.ViewModels.UserViewModel
+@{
+    ViewBag.Title = Model.User.CanonicalName + " (Protobuild)";
+}
 
 <breadcrumbs user="@Model.User" />
 
@@ -55,8 +58,8 @@ else
     </ul>
 }
 
-<div class="btn-group">
-    @if (false /* can edit user */)
+<buttongroup>
+    @if (Model.ViewerCanEditUser)
     {
         <a type="button" class="btn btn-primary" href="@Model.User.GetUrl("new")">New Package</a>
         <a type="button" class="btn btn-primary" href="@Model.User.GetUrl("rename")">Rename Account</a>
@@ -65,10 +68,9 @@ else
         {
             <a type="button" class="btn btn-primary" href="@Model.User.GetUrl("owner/add")">Add Owner</a>
         }
-        else
+        else if (Model.ViewerIsUser)
         {
-            /* Only show New Organisation when we look at our own account. */
             <a type="button" class="btn btn-primary" href="/organisation/new">New Organisation</a>
         }
     }
-</div><br /><br />
+</buttongroup>

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Protobuild.Website.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Protobuild.Website.TagHelpers
@@ -44,9 +43,9 @@ namespace Protobuild.Website.TagHelpers
                 breadcrumbs.Add(new Tuple<string, string>(User.CanonicalName, User.GetUrl()));
             }
 
-            if (Package != null)
+            if (Package != null && User != null)
             {
-                breadcrumbs.Add(new Tuple<string, string>(User.CanonicalName, User.GetUrl()));
+                breadcrumbs.Add(new Tuple<string, string>(Package.Name, Package.GetUrl(User)));
             }
 
             context.Items.Add("breadcrumbs", breadcrumbs);

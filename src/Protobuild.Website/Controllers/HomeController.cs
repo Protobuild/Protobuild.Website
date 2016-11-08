@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Protobuild.Website.Exceptions;
 using Protobuild.Website.Models;
 
 namespace Protobuild.Website.Controllers
@@ -39,6 +42,25 @@ namespace Protobuild.Website.Controllers
             };
 
             return View(model);
+        }
+
+        [Route("/error")]
+        public IActionResult Error(Exception exception)
+        {
+            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            var httpException = exceptionHandlerFeature.Error as HttpException;
+            if (httpException != null)
+            {
+                HttpContext.Response.StatusCode = httpException.StatusCode;
+            }
+
+            return View(exceptionHandlerFeature.Error);
+        }
+
+        [Route("/error/{code}")]
+        public IActionResult Error(Exception exception, int code)
+        {
+            return View(new HttpException(code));
         }
     }
 }

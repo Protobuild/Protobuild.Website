@@ -16,12 +16,39 @@
 
         public string Name { get; set; }
 
-        public string GitURL { get; set; }
+        public string GitUrl { get; set; }
 
         public string Description { get; set; }
 
         public string Type { get; set; }
 
         public string DefaultBranch { get; set; }
+
+        public string GetUrl(UserModel owner, string path = null)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return owner.GetUrl(Name);
+            }
+            else
+            {
+                return owner.GetUrl(Name + "/" + path);
+            }
+        }
+
+        public object ToJsonObject(UserModel owner)
+        {
+            return new
+            {
+                ownerID = GoogleId,
+                name = Name,
+                type = Type,
+                moduleUrl = ProtobuildEnv.GetDomain() + GetUrl(owner),
+                apiUrl = ProtobuildEnv.MakeApiUrl(ProtobuildEnv.GetDomain() + GetUrl(owner)),
+                gitUrl = GitUrl,
+                description = Description,
+                defaultBranch = DefaultBranch
+            };
+        }
     }
 }

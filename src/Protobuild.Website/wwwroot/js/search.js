@@ -13,6 +13,9 @@ function schedule_search_request() {
   active_request = "active";
   var query_copy = pending_query;
   pending_query = null;
+  if ($("#search-icon").attr("class") != "fa fa-spin fa-spinner") {
+    $("#search-icon").attr("class", "fa fa-spin fa-spinner");
+  }
   $.ajax(
     window.SEARCH_URI + "/search/" + encodeURI(query_copy),
     {
@@ -87,6 +90,8 @@ function schedule_search_request() {
         active_request = null;
         if (pending_query != null) {
           schedule_search_request();
+        } else {
+          $("#search-icon").attr("class", "fa fa-search");
         }
       }
     });

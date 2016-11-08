@@ -47,7 +47,7 @@
 
         public string GetUrl(string path = null)
         {
-            if (path == null)
+            if (string.IsNullOrWhiteSpace(path))
             {
                 return "/" + CanonicalName;
             }
