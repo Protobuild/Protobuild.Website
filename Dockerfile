@@ -18,6 +18,6 @@ RUN mkdir -pv /var/log/nginx /var/log/supervisor
 RUN chmod a+X /srv/extra/run.sh
 
 ENV ASPNETCORE_ENVIRONMENT Production
-ENV ASPNETCORE_URLS http://+:5000
+ENV ASPNETCORE_URLS http://localhost:5000
 WORKDIR /srv/protobuild/pkg
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
