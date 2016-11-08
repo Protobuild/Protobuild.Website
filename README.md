@@ -12,10 +12,11 @@ To run your own private Protobuild index, run this as a Docker container:
 
 ```
 docker run \
+  --rm \
   -p 80:80 \
   -p 443:443 \
   -v /path/to/ssl:/srv/nginx/ssl \
-  -v /path/to/gcp-creds:/srv/gcp
+  -v /path/to/gcp-creds:/srv/gcp \
   -e DOMAIN=https://yourdomain.com \
   -e GOOGLE_PROJECT_ID=your-gcp-project-id \
   -e GOOGLE_SERVICE_ACCOUNT_JSON_PATH=/srv/gcp/service.json \
