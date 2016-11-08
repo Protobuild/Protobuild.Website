@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Protobuild.Website.Exceptions;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
 namespace Protobuild.Website.Services
 {
@@ -12,12 +14,21 @@ namespace Protobuild.Website.Services
     {
         private DatastoreDb _db;
 
+        private readonly IDistributedCache _distributedCache;
+
         private KeyFactory _userKeyFactory;
 
         private KeyFactory _packageKeyFactory;
 
-        public GoogleDatastoreRepository()
+        private DistributedCacheEntryOptions _distributedCacheOptions =
+            new DistributedCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(30))
+                .SetAbsoluteExpiration(TimeSpan.FromHours(12));
+
+        public GoogleDatastoreRepository(IDistributedCache distributedCache)
         {
+            _distributedCache = distributedCache;
+
             Environment.SetEnvironmentVariable(
                 "GOOGLE_APPLICATION_CREDENTIALS",
                 ProtobuildEnv.GetServiceAccountPath());
@@ -42,6 +53,12 @@ namespace Protobuild.Website.Services
                 throw new NullReferenceException(nameof(name));
             }
 
+            var cachedValue = await _distributedCache.GetStringAsync("user:" + name);
+            if (cachedValue != null)
+            {
+                return UserModel.FromJsonCache(cachedValue);
+            }
+
             var query = new Query(UserModel.Kind)
             {
                 Filter = Filter.Equal("canonicalName", name),
@@ -55,7 +72,11 @@ namespace Protobuild.Website.Services
                 {
                     var entity = enumerator.Current;
 
-                    return MapUser(entity);
+                    var model = MapUser(entity);
+
+                    await _distributedCache.SetStringAsync("user:" + name, model.ToJsonCache(), _distributedCacheOptions);
+
+                    return model;
                 }
             }
 
@@ -76,6 +97,16 @@ namespace Protobuild.Website.Services
 
             var userModel = await LoadUserByName(user);
             
+            var cachedValue = await _distributedCache.GetStringAsync("package:" + userModel.CanonicalName + ":" + package);
+            if (cachedValue != null)
+            {
+                return new UserAndPackageResult
+                {
+                    User = userModel,
+                    Package = PackageModel.FromJsonCache(cachedValue)
+                };
+            }
+
             var query = new Query(PackageModel.Kind)
             {
                 Filter = Filter.And(Filter.Equal("googleID", userModel.GoogleId), Filter.Equal("name", package)),
@@ -100,6 +131,8 @@ namespace Protobuild.Website.Services
                 throw new Protobuild404Exception(CommonErrors.PACKAGE_NOT_FOUND);
             }
 
+            await _distributedCache.SetStringAsync("package:" + userModel.CanonicalName + ":" + package, packageModel.ToJsonCache(), _distributedCacheOptions);
+
             return new UserAndPackageResult
             {
                 User = userModel,
@@ -117,6 +150,14 @@ namespace Protobuild.Website.Services
             if (package == null)
             {
                 throw new NullReferenceException(nameof(package));
+            }
+
+            var cachedValue = await _distributedCache.GetStringAsync("branchesForPackage:" + user.CanonicalName + ":" + package.Name);
+            if (cachedValue != null)
+            {
+                var listOfJsonObjects = JsonConvert.DeserializeObject<string[]>(cachedValue);
+
+                return listOfJsonObjects.Select(x => BranchModel.FromJsonCache(x)).ToList();
             }
 
             var results = new List<BranchModel>();
@@ -138,6 +179,13 @@ namespace Protobuild.Website.Services
                 }
             }
 
+            var listOfJsonObjectsToCache = results.Select(x => x.ToJsonCache()).ToArray();
+
+            await _distributedCache.SetStringAsync(
+                "branchesForPackage:" + user.CanonicalName + ":" + package.Name,
+                JsonConvert.SerializeObject(listOfJsonObjectsToCache),
+                _distributedCacheOptions);
+
             return results;
         }
 
@@ -151,6 +199,14 @@ namespace Protobuild.Website.Services
             if (package == null)
             {
                 throw new NullReferenceException(nameof(package));
+            }
+
+            var cachedValue = await _distributedCache.GetStringAsync("versionsForPackage:" + user.CanonicalName + ":" + package.Name);
+            if (cachedValue != null)
+            {
+                var listOfJsonObjects = JsonConvert.DeserializeObject<string[]>(cachedValue);
+
+                return listOfJsonObjects.Select(x => VersionModel.FromJsonCache(x)).ToList();
             }
 
             var results = new List<VersionModel>();
@@ -171,6 +227,13 @@ namespace Protobuild.Website.Services
                     results.Add(MapVersion(entity));
                 }
             }
+
+            var listOfJsonObjectsToCache = results.Select(x => x.ToJsonCache()).ToArray();
+
+            await _distributedCache.SetStringAsync(
+                "versionsForPackage:" + user.CanonicalName + ":" + package.Name,
+                JsonConvert.SerializeObject(listOfJsonObjectsToCache),
+                _distributedCacheOptions);
 
             return results;
         }

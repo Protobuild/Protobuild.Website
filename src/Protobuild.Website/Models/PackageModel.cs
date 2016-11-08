@@ -1,4 +1,6 @@
-﻿namespace Protobuild.Website.Models
+﻿using Newtonsoft.Json;
+
+namespace Protobuild.Website.Models
 {
     public class PackageModel
     {
@@ -10,18 +12,25 @@
 
         public const string TypeGlobalTool = "global-tool";
 
+        [JsonProperty("key")]
         public long Key { get; set; }
 
+        [JsonProperty("googleId")]
         public string GoogleId { get; set; }
 
+        [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("gitUrl")]
         public string GitUrl { get; set; }
 
+        [JsonProperty("description")]
         public string Description { get; set; }
 
+        [JsonProperty("type")]
         public string Type { get; set; }
 
+        [JsonProperty("defaultBranch")]
         public string DefaultBranch { get; set; }
 
         public string GetUrl(UserModel owner, string path = null)
@@ -49,6 +58,16 @@
                 description = Description,
                 defaultBranch = DefaultBranch
             };
+        }
+
+        public static PackageModel FromJsonCache(string jsonString)
+        {
+            return JsonConvert.DeserializeObject<PackageModel>(jsonString);
+        }
+
+        public string ToJsonCache()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

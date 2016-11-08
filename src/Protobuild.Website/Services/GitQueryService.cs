@@ -6,13 +6,32 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Protobuild.Website.Models;
+using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
 namespace Protobuild.Website.Services
 {
     public class GitQueryService : IGitQueryService
     {
+        private readonly IDistributedCache _distributedCache;
+
+        private DistributedCacheEntryOptions _distributedCacheOptions =
+            new DistributedCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+
+        public GitQueryService(IDistributedCache distributedCache)
+        {
+            _distributedCache = distributedCache;
+        }
+
         public async Task<List<BranchModel>> GetBranches(PackageModel package)
         {
+            var cachedValue = await _distributedCache.GetStringAsync("gitBranches:" + package.GitUrl);
+            if (cachedValue != null)
+            {
+                return JsonConvert.DeserializeObject<string[]>(cachedValue).Select(x => BranchModel.FromJsonCache(x)).ToList();
+            }
+
             var startInfo = new ProcessStartInfo();
 
             startInfo.UseShellExecute = false;
@@ -70,6 +89,10 @@ namespace Protobuild.Website.Services
                 }
             }
 
+            await _distributedCache.SetStringAsync(
+                "gitBranches:" + package.GitUrl, 
+                JsonConvert.SerializeObject(results.Select(x => x.ToJsonCache()).ToArray()),
+                _distributedCacheOptions);
 
             return results;
         }
