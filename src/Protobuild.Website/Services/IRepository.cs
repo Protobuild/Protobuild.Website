@@ -8,9 +8,9 @@ namespace Protobuild.Website.Services
     {
         Task<UserModel> LoadUserByName(string name);
 
-        Task<IEnumerable<PackageModel>> LoadAllPackagesForUser(UserModel user);
-
         Task<UserAndPackageResult> LoadUserAndPackageByNames(string user, string package);
+
+        Task<List<PackageModel>> LoadAllPackagesForUser(UserModel user, int? limit = null);
 
         Task<List<BranchModel>> LoadAllBranchesForPackage(UserModel user, PackageModel package, int? limit = null);
 

@@ -23,11 +23,12 @@ namespace Protobuild.Website.Controllers
         {
             var userModel = await _repository.LoadUserByName(user);
 
-            // TODO: Model with packages
+            var packages = await _repository.LoadAllPackagesForUser(userModel);
+            
             return View(new UserViewModel
             {
                 User = userModel,
-                Packages = new List<PackageModel>(),
+                Packages = packages,
                 Owners = new List<UserModel>()
             });
         }

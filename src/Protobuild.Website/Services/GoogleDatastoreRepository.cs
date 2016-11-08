@@ -41,11 +41,6 @@ namespace Protobuild.Website.Services
             _packageKeyFactory = _db.CreateKeyFactory(PackageModel.Kind);
         }
 
-        public async Task<IEnumerable<PackageModel>> LoadAllPackagesForUser(UserModel user)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<UserModel> LoadUserByName(string name)
         {
             if (name == null)
@@ -138,6 +133,50 @@ namespace Protobuild.Website.Services
                 User = userModel,
                 Package = packageModel
             };
+        }
+
+        public async Task<List<PackageModel>> LoadAllPackagesForUser(UserModel user, int? limit = null)
+        {
+            if (user == null)
+            {
+                throw new NullReferenceException(nameof(user));
+            }
+
+            var cachedValue = await _distributedCache.GetStringAsync("packagesForUser:" + user.CanonicalName);
+            if (cachedValue != null)
+            {
+                var listOfJsonObjects = JsonConvert.DeserializeObject<string[]>(cachedValue);
+
+                return listOfJsonObjects.Select(x => PackageModel.FromJsonCache(x)).ToList();
+            }
+
+            var results = new List<PackageModel>();
+
+            var query = new Query(PackageModel.Kind)
+            {
+                Filter = Filter.Equal("googleID", user.GoogleId),
+                Limit = limit
+            };
+
+            var result = _db.RunQueryLazilyAsync(query, ReadOptions.Types.ReadConsistency.Eventual);
+            using (var enumerator = result.GetEnumerator())
+            {
+                while (await enumerator.MoveNext())
+                {
+                    var entity = enumerator.Current;
+
+                    results.Add(MapPackage(entity));
+                }
+            }
+
+            var listOfJsonObjectsToCache = results.Select(x => x.ToJsonCache()).ToArray();
+
+            await _distributedCache.SetStringAsync(
+                "packagesForUser:" + user.CanonicalName,
+                JsonConvert.SerializeObject(listOfJsonObjectsToCache),
+                _distributedCacheOptions);
+
+            return results;
         }
 
         public async Task<List<BranchModel>> LoadAllBranchesForPackage(UserModel user, PackageModel package, int? limit = null)

@@ -47,7 +47,7 @@ else
         {
             <li>
                 <a href="@owner.GetUrl()">@owner.CanonicalName</a>
-                @if (false /* can remove owner */)
+                @if (Model.ViewerCanEditUser)
                 {
                     <text> (</text>
                     <a href="@Model.User.GetUrl("owner/remove/" + owner.CanonicalName)">Remove</a>
