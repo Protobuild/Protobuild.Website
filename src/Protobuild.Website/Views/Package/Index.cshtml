@@ -1,0 +1,42 @@
+﻿@model Protobuild.Website.ViewModels.PackageViewModel
+@using Protobuild.Website.Models
+
+<breadcrumbs user="@Model.User" package="@Model.Package" />
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form role="form" method="POST">
+            <p>
+                @if (Model.Package.Type == PackageModel.TypeLibrary || Model.Package.Type == PackageModel.TypeGlobalTool)
+                {
+                    <text>Add this package to your project by running:</text>
+                }
+                else if (Model.Package.Type == PackageModel.TypeTemplate)
+                {
+                    <text>Start with this project template by running:</text>
+                }
+            </p>
+            @{ 
+                var isWindows = false;
+                var userAgent = ViewContext.HttpContext.Request.Headers.FirstOrDefault(x => x.Key == "User-Agent");
+                if (userAgent.Value.Any(x => x.Contains("Windows")))
+                {
+                    isWindows = true;
+                }
+
+                var prefix = isWindows ? string.Empty : "mono ";
+                var instr = "TODO";
+            }
+            <div class="form-group" style="margin-bottom: 0px;">
+                <input type="text" class="form-control" disabled="disabled" value="@instr">
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.Package.GitURL))
+{
+    <h3>Source Code</h3>
+    <p>The source code for this package resides at:</p>
+    <p><a href="@Model.Package.GitURL"><strong>@Model.Package.GitURL</strong></a></p>
+}

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Protobuild.Website.Authorization;
+using Protobuild.Website.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,18 @@ namespace Protobuild.Website.Controllers
 {
     public class PackageController : Controller
     {
-        [Route("/{user}/{package}")]
-        public IActionResult Index(string user, string package)
+        private readonly IRepository _repository;
+
+        public PackageController(IRepository repository)
         {
+            _repository = repository;
+        }
+
+        [Route("/{user}/{package}")]
+        public async Task<IActionResult> Index(string user, string package)
+        {
+            var result = await _repository.LoadUserAndPackageByNames(user, package);
+
             return View();
         }
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Protobuild.Website.Models
+﻿namespace Protobuild.Website.Models
 {
     public class UserModel
     {
