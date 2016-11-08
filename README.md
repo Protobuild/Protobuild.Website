@@ -42,7 +42,7 @@ tool will be able to establish an SSL connection to the server.
 
 ### Data Storage Configuration
 
-Because this container uses Google Cloud Storage and Google Cloud Datastore as it's data storage mechanisms, you need to provide the Project ID, and map the credential
+Because this container uses Google Cloud Storage and Google Cloud Datastore for data storage, you need to provide the Project ID, and map the credential
 files into the container.  On your host you should have a folder like this:
 
 - `/path/to/gcp-creds`
