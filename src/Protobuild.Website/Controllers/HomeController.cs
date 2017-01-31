@@ -37,7 +37,8 @@ namespace Protobuild.Website.Controllers
                     Name = "Download for Linux",
                     Platform = "linux",
                     Url = null,
-                    Command = $"curl -L {ProtobuildEnv.GetDomain()}/get/linux | bash"
+                    Command = $"curl -L {ProtobuildEnv.GetDomain()}/get/linux | bash",
+                    ShowDependencyWarning = true
                 },
             };
 

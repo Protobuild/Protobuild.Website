@@ -9,5 +9,7 @@
         public string Url { get; set; }
 
         public string Command { get; set; }
+
+        public bool ShowDependencyWarning { get; set; }
     }
 }

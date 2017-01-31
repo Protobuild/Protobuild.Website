@@ -11,11 +11,11 @@ namespace Protobuild.Website.Controllers
             switch (platform)
             {
                 case "windows":
-                    return Redirect("https://s3.amazonaws.com/redpointx/ProtobuildWebInstall.exe");
+                    return Redirect("https://github.com/Protobuild/Protobuild.Manager/releases/download/latest/ProtobuildWindowsInstall.exe");
                 case "mac":
-                    return Redirect("https://s3.amazonaws.com/redpointx/ProtobuildMacOSInstall.sh");
+                    return Redirect("https://github.com/Protobuild/Protobuild.Manager/releases/download/latest/ProtobuildMacOSInstall.sh");
                 case "linux":
-                    return Redirect("https://s3.amazonaws.com/redpointx/ProtobuildLinuxInstall.sh");
+                    return Redirect("https://github.com/Protobuild/Protobuild.Manager/releases/download/latest/ProtobuildLinuxInstall.sh");
                 default:
                     return Redirect("https://github.com/Protobuild/Protobuild/raw/master/Protobuild.exe");
             }
