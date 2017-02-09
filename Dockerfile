@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:latest
+FROM microsoft/dotnet:1.1-sdk-msbuild
 
 RUN apt-get update
 RUN apt-get install -y nginx nodejs npm git supervisor dos2unix
@@ -19,7 +19,7 @@ RUN dos2unix /srv/extra/run.sh
 RUN chmod a+X /srv/extra/run.sh
 
 ENV ASPNETCORE_ENVIRONMENT Production
-ENV ASPNETCORE_URLS http://localhost:5000
+ENV ASPNETCORE_URLS http://*:5000
 
 ENV DOMAIN http://localhost:8080
 ENV GOOGLE_PROJECT_ID protobuild-index
